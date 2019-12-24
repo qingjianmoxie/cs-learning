@@ -6,26 +6,6 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of Redis nor the names of its contributors may be used
- *     to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
  */
 
 
@@ -240,8 +220,8 @@ list *listInsertNode(list *list, listNode *old_node, void *value, int after) {
  *
  * This function can't fail. */
 /*
- * 从链表 list 中删除给定节点 node 
- * 
+ * 从链表 list 中删除给定节点 node
+ *
  * 对节点私有值(private value of the node)的释放工作由调用者进行。
  *
  * T = O(1)
@@ -456,9 +436,9 @@ list *listDup(list *orig)
  * On success the first matching node pointer is returned
  * (search starts from head). If no matching node exists
  * NULL is returned. */
-/* 
+/*
  * 查找链表 list 中值和 key 匹配的节点。
- * 
+ *
  * 对比操作由链表的 match 函数负责进行，
  * 如果没有设置 match 函数，
  * 那么直接通过对比值的指针来决定是否匹配。
@@ -476,7 +456,7 @@ listNode *listSearchKey(list *list, void *key)
     // 迭代整个链表
     iter = listGetIterator(list, AL_START_HEAD);
     while((node = listNext(iter)) != NULL) {
-        
+
         // 对比
         if (list->match) {
             if (list->match(node->value, key)) {
@@ -492,7 +472,7 @@ listNode *listSearchKey(list *list, void *key)
             }
         }
     }
-    
+
     listReleaseIterator(iter);
 
     // 未找到
