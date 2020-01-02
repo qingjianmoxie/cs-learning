@@ -22,6 +22,8 @@
     * [core dump](Linux/core_dump.md)
     * [gcc编译命令](Linux/gcc编译命令.md)
     * [git的使用](Linux/git的使用.md)
+    * [初识Makefile](Linux/初识Makefile.md)
+    * [掌握Makefile](Linux/掌握Makefile.md)
     * [Perf -- Linux下的系统性能调优工具](Linux/perf.md)
 * [go](go/README.md)
 * [分布式数据库](分布式数据库/README.md)
