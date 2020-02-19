@@ -4,9 +4,9 @@ list是顺序容器的一种。list是一个双向链表。使用 list 需要包
 
 在 list 容器中，在已经定位到要增删元素的位置的情况下，增删元素能在常数时间内完成。如图2所示，在 a<sub>i</sub> 和 a<sub>i+1</sub> 之间插入一个元素，只需要修改 a<sub>i</sub> 和 a<sub>i+1</sub> 中的指针即可。
 
-![图1：双向链表](https://upload-images.jianshu.io/upload_images/5436814-40b5d7f15c5f282e.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图1：双向链表](../pic/list_双向链表.jpg)
 
-![图2：在双向链表中插入元素](https://upload-images.jianshu.io/upload_images/5436814-7bb17f907ed7967a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![图2：在双向链表中插入元素](../pic/list_在双向链表中插入元素.jpg)
 
 list容器不支持根据下标随机存取元素。
 
