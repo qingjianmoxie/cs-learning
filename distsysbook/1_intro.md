@@ -1,4 +1,4 @@
-# %chapter_number%. Distributed systems at a high level
+# 1. Distributed systems at a high level
 
 > Distributed programming is the art of solving the same problem that you can solve on a single computer using multiple computers.
 
@@ -17,26 +17,23 @@ It is a current reality that the best value is in mid-range, commodity hardware 
 
 Computations primarily benefit from high-end(高端) hardware to the extent to which they can replace slow network accesses with internal memory accesses. The performance advantage of high-end hardware is limited in tasks that require large amounts of communication between nodes.
 
-![cost-efficiency](images/barroso_holzle.png)
+![cost-efficiency](http://book.mixu.net/distsys/images/barroso_holzle.png)
 
 As the figure above from [Barroso, Clidaras & Hölzle](http://www.morganclaypool.com/doi/abs/10.2200/S00516ED2V01Y201306CAC024) shows, the performance gap between high-end and commodity hardware decreases with cluster size assuming a uniform memory access pattern across all nodes.(假设所有节点的内存访问模式都是一致的，那么高端硬件和普通硬件之间的性能差距会随着集群的增大而减小)
 
 Ideally(理想情况下), adding a new machine would increase the performance(性能) and capacity(容量) of the system linearly. But of course this is not possible, because there is some overhead(开销) that arises due to having separate computers. Data needs to be copied around, computation tasks have to be coordinated(协调) and so on. This is why it's worthwhile to study distributed algorithms - they provide efficient solutions to specific problems, as well as guidance about what is possible, what the minimum cost of a correct implementation is, and what is impossible.
 
-The focus of this text is on distributed programming and systems in a mundane, but commercially relevant setting: the data center. For example, I will not discuss specialized problems that arise from having an exotic network configuration(异常网络配置), or that arise in a shared-memory(共享内存) setting. Additionally, the focus is on exploring the system design space rather than on optimizing any specific design - the latter is a topic for a much more specialized text.
+The focus of this text is on distributed programming and systems in a mundane, but commercially relevant setting: the data center.(本文的重点是一个平凡但与商业相关的环境中的分布式编程和系统：数据中心。) For example, I will not discuss specialized problems that arise from having an exotic network configuration(异常网络配置), or that arise in a shared-memory(共享内存) setting. Additionally, the focus is on exploring the system design space rather than on optimizing any specific design - the latter is a topic for a much more specialized text.
 
 ## What we want to achieve: Scalability(可扩展性) and other good things
 
 The way I see it, everything starts with the need to deal with size.
 
-Most things are trivial at a small scale - and the same problem becomes much harder once you surpass a certain size, volume or other physically constrained thing. It's easy to lift a piece of chocolate, it's hard to lift a mountain. It's easy to count how many people are in a room, and hard to count how many people are in a country.
+Most things are trivial(不重要的) at a small scale - and the same problem becomes much harder once you surpass a certain size, volume or other physically constrained thing. It's easy to lift a piece of chocolate, it's hard to lift a mountain. It's easy to count how many people are in a room, and hard to count how many people are in a country.
 
 So everything starts with size - scalability. Informally speaking, in a scalable system as we move from small to large, things should not get incrementally worse. Here's another definition:
 
-<dl>
-  <dt>[Scalability](http://en.wikipedia.org/wiki/Scalability)</dt>
-  <dd>is the ability of a system, network, or process, to handle a growing amount of work in a capable manner or its ability to be enlarged to accommodate that growth.</dd>
-</dl>
+  [Scalability](http://en.wikipedia.org/wiki/Scalability) is the ability of a system, network, or process, to handle a growing amount of work in a capable manner or its ability to be enlarged to accommodate that growth.
 
 What is it that is growing? Well, you can measure growth in almost any terms (number of people, electricity usage etc.). But there are three particularly interesting things to look at:
 
@@ -44,16 +41,13 @@ What is it that is growing? Well, you can measure growth in almost any terms (nu
 - Geographic(地理的) scalability: it should be possible to use multiple data centers to reduce the time it takes to respond to user queries, while dealing with cross-data center latency in some sensible manner.(它应该可以使用多个数据中心来减少响应用户查询所需的时间，同时以某种明智的方式处理跨数据中心延迟。)
 - Administrative scalability: adding more nodes should not increase the administrative costs(管理成本) of the system (e.g. the administrators-to-machines ratio).
 
-Of course, in a real system growth occurs on multiple different axes simultaneously; each metric captures just some aspect of growth.
+Of course, in a real system growth occurs on multiple different axes(轴) simultaneously; each metric captures just some aspect of growth.
 
 A scalable system is one that continues to meet the needs of its users as scale increases. There are two particularly relevant aspects - performance and availability - which can be measured in various ways.
 
 ### Performance (and latency)
 
-<dl>
-  <dt>[Performance](http://en.wikipedia.org/wiki/Computer_performance)</dt>
-  <dd>is characterized by the amount of useful work accomplished by a computer system compared to the time and resources used.</dd>
-</dl>
+  [Performance](http://en.wikipedia.org/wiki/Computer_performance) is characterized by the amount of useful work accomplished by a computer system compared to the time and resources used.
 
 Depending on the context, this may involve achieving one or more of the following:
 

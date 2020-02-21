@@ -11,15 +11,13 @@ In my view, much of distributed programming is about dealing with the implicatio
 
 In other words, that the core of distributed programming is dealing with distance (duh!) and having more than one thing (duh!). These constraints define a space of possible system designs, and my hope is that after reading this you'll have a better sense of how distance, time and consistency models interact.
 
-This text is focused on distributed programming and systems concepts you'll need to understand commercial systems in the data center. It would be madness(疯狂) to attempt to cover everything. You'll learn many key protocols and algorithms (covering, for example, many of the most cited papers in the discipline), including some new exciting ways to look at eventual consistency that haven't still made it into college textbooks - such as CRDTs and the CALM theorem.
+This text is focused on distributed programming and systems concepts you'll need to understand commercial systems in the data center. It would be madness(疯狂) to attempt to cover everything. You'll learn many key protocols and algorithms (covering, for example, many of the most cited(引用) papers in the discipline(学科,知识领域)), including some new exciting ways to look at eventual consistency that haven't still made it into college textbooks - such as CRDTs and the CALM theorem.
 
 I hope you like it! If you want to say thanks, follow me on [Github](https://github.com/mixu/) (or [Twitter](http://twitter.com/mikitotakada)). And if you spot an error, [file a pull request on Github](https://github.com/mixu/distsysbook/issues).
 
----
-
 # 1. Basics
 
-[The first chapter](1_intro.md) covers distributed systems at a high level by introducing a number of important terms and concepts. It covers high level goals, such as scalability(可扩展性), availability, performance, latency(延迟) and fault tolerance(容错); how those are hard to achieve, and how abstractions and models as well as partitioning and replication come into play.
+[The first chapter](1_intro.md) covers distributed systems at a high level by introducing a number of important terms and concepts. It covers high level goals, such as scalability(可扩展性), availability, performance, latency(延迟) and fault tolerance(容错); how those are hard to achieve, and how abstractions(抽象) and models as well as partitioning and replication come into play.
 
 # 2. Up and down the level of abstraction
 
@@ -27,11 +25,11 @@ I hope you like it! If you want to say thanks, follow me on [Github](https://git
 
 # 3. Time and order
 
-A big part of understanding distributed systems is about understanding time and order.  To the extent that we fail to understand and model time, our systems will fail. [The third chapter](3_time.md) discusses time and order, and clocks as well as the various uses of time, order and clocks (such as vector clocks and failure detectors).
+A big part of understanding distributed systems is about understanding time and order.  To the extent that we fail to understand and model time, our systems will fail. [The third chapter](3_time.md) discusses time and order, and clocks as well as the various uses of time, order and clocks (such as vector clocks and failure detectors(检测器)).
 
 # 4. Replication: preventing divergence
 
-The [fourth chapter](4_replication.md) introduces the replication problem, and the two basic ways in which it can be performed. It turns out that most of the relevant characteristics can be discussed with just this simple characterization. Then, replication methods for maintaining single-copy consistency are discussed from the least fault tolerant (2PC) to Paxos.
+The [fourth chapter](4_replication.md) introduces the replication(复制) problem, and the two basic ways in which it can be performed. It turns out that most of the relevant characteristics can be discussed with just this simple characterization. Then, replication methods for maintaining single-copy consistency are discussed from the least fault tolerant (2PC) to Paxos.
 
 # 5. Replication: accepting divergence
 
@@ -43,5 +41,4 @@ The [fifth chapter](5_eventual.md) discussed replication with weak consistency g
 
 ---
 
-<p class="footnote">*: This is a [lie](http://en.wikipedia.org/wiki/Statistical_independence). [This post by Jay Kreps elaborates](http://blog.empathybox.com/post/19574936361/getting-real-about-distributed-system-reliability).
-</p>
+*: This is a [lie](http://en.wikipedia.org/wiki/Statistical_independence). [This post by Jay Kreps elaborates](http://blog.empathybox.com/post/19574936361/getting-real-about-distributed-system-reliability).
