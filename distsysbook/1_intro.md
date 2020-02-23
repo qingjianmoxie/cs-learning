@@ -33,7 +33,7 @@ Most things are trivial(不重要的) at a small scale - and the same problem be
 
 So everything starts with size - scalability. Informally speaking, in a scalable system as we move from small to large, things should not get incrementally worse. Here's another definition:
 
-  [Scalability](http://en.wikipedia.org/wiki/Scalability) is the ability of a system, network, or process, to handle a growing amount of work in a capable manner or its ability to be enlarged to accommodate that growth.
+>[Scalability](http://en.wikipedia.org/wiki/Scalability) is the ability of a system, network, or process, to handle a growing amount of work in a capable manner or its ability to be enlarged to accommodate that growth.
 
 What is it that is growing? Well, you can measure growth in almost any terms (number of people, electricity usage etc.). But there are three particularly interesting things to look at:
 
@@ -47,7 +47,7 @@ A scalable system is one that continues to meet the needs of its users as scale 
 
 ### Performance (and latency)
 
-  [Performance](http://en.wikipedia.org/wiki/Computer_performance) is characterized by the amount of useful work accomplished by a computer system compared to the time and resources used.
+>[Performance](http://en.wikipedia.org/wiki/Computer_performance) is characterized by the amount of useful work accomplished by a computer system compared to the time and resources used.
 
 Depending on the context, this may involve achieving one or more of the following:
 
@@ -55,24 +55,18 @@ Depending on the context, this may involve achieving one or more of the followin
 - High throughput(高吞吐量) (rate of processing work)
 - Low utilization of computing resource(s)
 
-There are tradeoffs(权衡) involved in optimizing for any of these outcomes. For example, a system may achieve a higher throughput by processing larger batches of work thereby reducing operation overhead. The tradeoff would be longer response times for individual pieces of work due to batching.
+There are tradeoffs(权衡) involved in optimizing for any of these outcomes. For example, a system may achieve a higher throughput by processing larger batches of work thereby(因此) reducing operation overhead. The tradeoff would be longer response times for individual pieces of work due to batching.(为这些结果中的任何一个进行优化都涉及到权衡。例如，系统可以通过处理更大批量的工作来实现更高的吞吐量，从而减少操作开销。由于分批处理，权衡使得单个工作的响应时间会更长。)
 
 I find that low latency - achieving a short response time - is the most interesting aspect of performance, because it has a strong connection with physical (rather than financial) limitations. It is harder to address(解决) latency using financial resources than the other aspects of performance.
 
 There are a lot of really specific definitions for latency, but I really like the idea that the etymology of the word evokes:
 ps:etymology(the origin and history of a particular word)
 
-<dl>
-  <dt>Latency</dt>
-  <dd>The state of being latent; delay, a period between the initiation of something and the occurrence.</dd>
-</dl>
+>Latency    The state of being latent; delay, a period between the initiation of something and the occurrence.
 
 And what does it mean to be "latent"?
 
-<dl>
-  <dt>Latent</dt>
-  <dd>From Latin latens, latentis, present participle of lateo ("lie hidden"). Existing or present but concealed(隐藏的) or inactive.</dd>
-</dl>
+>Latent    From Latin latens, latentis, present participle of lateo ("lie hidden"). Existing or present but concealed(隐藏的) or inactive.
 
 This definition is pretty cool, because it highlights how latency is really the time between when something happened and the time it has an impact or becomes visible.
 
