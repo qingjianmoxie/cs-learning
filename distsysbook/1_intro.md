@@ -62,11 +62,13 @@ I find that low latency - achieving a short response time - is the most interest
 There are a lot of really specific definitions for latency, but I really like the idea that the etymology of the word evokes:
 ps:etymology(the origin and history of a particular word)
 
->Latency    The state of being latent; delay, a period between the initiation of something and the occurrence.
+> Latency  
+> The state of being latent; delay, a period between the initiation of something and the occurrence.
 
 And what does it mean to be "latent"?
 
->Latent    From Latin latens, latentis, present participle of lateo ("lie hidden"). Existing or present but concealed(隐藏的) or inactive.
+> Latent  
+> From Latin latens, latentis, present participle of lateo ("lie hidden"). Existing or present but concealed(隐藏的) or inactive.
 
 This definition is pretty cool, because it highlights how latency is really the time between when something happened and the time it has an impact or becomes visible.
 
@@ -78,9 +80,9 @@ Let's assume for a moment that our distributed system does just one high-level t
 
 Then, what matters for latency is not the amount of old data, but rather the speed at which new data "takes effect" in the system. For example, latency could be measured in terms of how long it takes for a write to become visible to readers.
 
-The other key point based on this definition is that if nothing happens, there is no "latent period". A system in which data doesn't change doesn't (or shouldn't) have a latency problem.
+The other key point based on this definition is that if nothing happens, there is no "latent period(潜伏期)". A system in which data doesn't change doesn't (or shouldn't) have a latency problem.
 
-In a distributed system, there is a minimum latency that cannot be overcome: the speed of light limits how fast information can travel, and hardware components(组件) have a minimum latency cost incurred per operation (think RAM and hard drives but also CPUs).
+In a distributed system, there is a minimum latency that cannot be overcome: the speed of light limits how fast information can travel, and hardware components(组件) have a minimum latency cost incurred per operation (think RAM and hard drives but also CPUs).(硬件组件(如RAM和硬盘驱动器，以及cpu)的每个操作所产生的最小延迟成本)
 
 How much that minimum latency impacts your queries depends on the nature(性质) of those queries and the physical distance the information needs to travel.
 
@@ -88,20 +90,19 @@ How much that minimum latency impacts your queries depends on the nature(性质)
 
 The second aspect of a scalable system is availability.
 
-<dl>
-  <dt>[Availability](http://en.wikipedia.org/wiki/High_availability)</dt>
-  <dd>the proportion(比例) of time a system is in a functioning condition(运行状态). If a user cannot access the system, it is said to be unavailable. </dd>
-</dl>
+> [Availability](http://en.wikipedia.org/wiki/High_availability)  
+> the proportion(比例) of time a system is in a functioning condition(运行状态). If a user cannot access the system, it is said to be unavailable.
 
 Distributed systems allow us to achieve desirable characteristics that would be hard to accomplish on a single system. For example, a single machine cannot tolerate any failures since it either fails or doesn't.(例如，一台机器不能容许任何故障，因为它要么发生故障，要么不发生故障。)
 
 Distributed systems can take a bunch of unreliable components, and build a reliable system on top of them.
 
 Systems that have no redundancy(冗余) can only be as available as their underlying components(基础组件). Systems built with redundancy can be tolerant of partial failures and thus be more available. It is worth noting that "redundant" can mean different things depending on what you look at - components, servers, datacenters and so on.
+ps: It is worth noting that 值得注意的是
 
 Formulaically, availability is: `Availability = uptime / (uptime + downtime)`.
 
-Availability from a technical perspective is mostly about being fault tolerant. Because the probability of a failure occurring increases with the number of components, the system should be able to compensate(补偿) so as to not become less reliable as the number of components increases.
+Availability from a technical perspective(观点,角度) is mostly about being fault tolerant. Because the probability of a failure occurring increases with the number of components, the system should be able to compensate(补偿) so as to not become less reliable as the number of components increases.
 
 For example:
 
@@ -138,13 +139,12 @@ For example:
 
 
 Availability is in some sense a much wider concept than uptime(运行时间), since the availability of a service can also be affected by, say, a network outage or the company owning the service going out of business (which would be a factor which is not really relevant to fault tolerance but would still influence the availability of the system). But without knowing every single specific aspect of the system, the best we can do is design for fault tolerance.
+在某种意义上，可用性是一个比正常运行时间更广泛的概念，因为服务的可用性还可能受到网络中断或拥有服务的公司停业的影响（这是一个与容错性并不真正相关但仍会影响系统可用性的因素）。但在不了解系统的每一个具体方面的情况下，我们能做的就是设计容错性.
 
 What does it mean to be fault tolerant?
 
-<dl>
-  <dt>Fault tolerance</dt>
-  <dd>ability of a system to behave in a well-defined manner once faults occur</dd>
-</dl>
+> Fault tolerance  
+> ability of a system to behave in a well-defined manner once faults occur
 
 Fault tolerance boils down to(归结为) this: define what faults you expect and then design a system or an algorithm that is tolerant of them. You can't tolerate faults you haven't considered.
 
@@ -163,15 +163,15 @@ Working within those constraints:
 
 Beyond these tendencies - which are a result of the physical constraints - is the world of system design options.
 
-Both performance and availability are defined by the external guarantees the system makes. On a high level, you can think of the guarantees as the SLA (service level agreement) for the system: if I write data, how quickly can I access it elsewhere? After the data is written, what guarantees do I have of durability? If I ask the system to run a computation, how quickly will it return results? When components fail, or are taken out of operation, what impact will this have on the system?
+Both performance and availability are defined by the external guarantees the system makes. On a high level, you can think of the guarantees as the SLA (service level agreement) for the system(性能和可用性都由系统提供的外部保证来定义。从高level角度看，你可以将这些保证看作是系统的SLA（服务级别协议）): if I write data, how quickly can I access it elsewhere? After the data is written, what guarantees do I have of durability(持久性)? If I ask the system to run a computation, how quickly will it return results? When components fail, or are taken out of operation, what impact will this have on the system?
 
-There is another criterion, which is not explicitly mentioned but implied: intelligibility. How understandable are the guarantees that are made? Of course, there are no simple metrics for what is intelligible.
+There is another criterion(标准,准则), which is not explicitly mentioned but implied(暗示): intelligibility(可理解性). How understandable are the guarantees that are made? Of course, there are no simple metrics(指标,度量) for what is intelligible.
 
-I was kind of tempted to put "intelligibility" under physical limitations. After all, it is a hardware limitation in people that we have a hard time understanding anything that involves [more moving things than we have fingers](http://en.wikipedia.org/wiki/Working_memory#Capacity). That's the difference between an error and an anomaly - an error is incorrect behavior, while an anomaly is unexpected behavior. If you were smarter, you'd expect the anomalies to occur.
+I was kind of(有点) tempted to put "intelligibility" under physical limitations. After all, it is a hardware limitation in people that we have a hard time understanding anything that involves [more moving things than we have fingers](http://en.wikipedia.org/wiki/Working_memory#Capacity). That's the difference between an error and an anomaly(异常) - an error is incorrect behavior, while an anomaly is unexpected behavior. If you were smarter, you'd expect the anomalies to occur.
 
 ## Abstractions and models
 
-This is where abstractions and models come into play. Abstractions make things more manageable by removing real-world aspects that are not relevant to solving a problem. Models describe the key properties of a distributed system in a precise manner. I'll discuss many kinds of models in the next chapter, such as:
+This is where abstractions and models come into play. Abstractions make things more manageable by removing real-world aspects that are not relevant to solving a problem. Models describe the key properties of a distributed system in a precise(精确的) manner(方式). I'll discuss many kinds of models in the next chapter, such as:
 
 - System model (asynchronous / synchronous)
 - Failure model (crash-fail, partitions, Byzantine)
