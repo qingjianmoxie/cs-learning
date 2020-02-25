@@ -1,34 +1,34 @@
-# %chapter_number%. Up and down the level of abstraction
+# 2. Up and down the level of abstraction
 
 In this chapter, we'll travel up and down the level of abstraction, look at some impossibility results (CAP and FLP), and then travel back down for the sake of performance.
 
 If you've done any programming, the idea of levels of abstraction is probably familiar to you. You'll always work at some level of abstraction, interface with a lower level layer through some API, and probably provide some higher-level API or user interface to your users. The seven-layer [OSI model of computer networking](http://en.wikipedia.org/wiki/OSI_model) is a good example of this.
 
-Distributed programming is, I'd assert, in large part dealing with consequences of distribution (duh!). That is, there is a tension between the reality that there are many nodes and with our desire for systems that "work like a single system". That means finding a good abstraction that balances what is possible with what is understandable and performant.
+Distributed programming is, I'd assert, in large part dealing with consequences(后果) of distribution (duh!). That is, there is a tension between the reality that there are many nodes and with our desire for systems that "work like a single system". That means finding a good abstraction that balances what is possible with what is understandable and performant.
 
 What do we mean when say X is more abstract than Y? First, that X does not introduce anything new or fundamentally different from Y. In fact, X may remove some aspects of Y or present them in a way that makes them more manageable.
-Second, that X is in some sense easier to grasp than Y, assuming that the things that X removed from Y are not important to the matter at hand.
+Second, that X is in some sense easier to grasp(理解) than Y, assuming that the things that X removed from Y are not important to the matter at hand.
 
 As [Nietzsche](http://oregonstate.edu/instruct/phl201/modules/Philosophers/Nietzsche/Truth_and_Lie_in_an_Extra-Moral_Sense.htm) wrote:
 
-> Every concept originates through our equating what is unequal. No leaf ever wholly equals another, and the concept "leaf" is formed through an arbitrary abstraction from these individual differences, through forgetting the distinctions; and now it gives rise to the idea that in nature there might be something besides the leaves which would be "leaf" - some kind of original form after which all leaves have been woven, marked, copied, colored, curled, and painted, but by unskilled hands, so that no copy turned out to be a correct, reliable, and faithful image of the original form.
+> Every concept originates(起源) through our equating(等同) what is unequal. No leaf ever wholly equals another, and the concept "leaf" is formed through an arbitrary(任意的) abstraction from these individual differences, through forgetting the distinctions; and now it gives rise to the idea that in nature there might be something besides the leaves which would be "leaf" - some kind of original form after which all leaves have been woven, marked, copied, colored, curled, and painted, but by unskilled hands, so that no copy turned out to be a correct, reliable, and faithful image of the original form.
 
-Abstractions, fundamentally, are fake. Every situation is unique, as is every node. But abstractions make the world manageable: simpler problem statements - free of reality - are much more analytically tractable and provided that we did not ignore anything essential, the solutions are widely applicable.
+Abstractions, fundamentally(根本上), are fake. Every situation is unique, as is every node. But abstractions make the world manageable: simpler problem statements - free of reality - are much more analytically tractable(易处理的) and provided that(假如) we did not ignore anything essential, the solutions are widely applicable(适用的).
 
-Indeed, if the things that we kept around are essential, then the results we can derive will be widely applicable. This is why impossibility results are so important: they take the simplest possible formulation of a problem, and demonstrate that it is impossible to solve within some set of constraints or assumptions.
+Indeed, if the things that we kept around are essential, then the results we can derive(获得) will be widely applicable. This is why impossibility results are so important: they take the simplest possible formulation of a problem, and demonstrate(证明) that it is impossible to solve within some set of constraints or assumptions.
 
-All abstractions ignore something in favor of equating things that are in reality unique. The trick is to get rid of everything that is not essential. How do you know what is essential? Well, you probably won't know a priori.
+All abstractions ignore something in favor of equating things that are in reality unique. The trick is to get rid of everything that is not essential. How do you know what is essential? Well, you probably won't know a priori(先验).
 
-Every time we exclude some aspect of a system from our specification of the system, we risk introducing a source of error and/or a performance issue. That's why sometimes we need to go in the other direction, and selectively introduce some aspects of real hardware and the real-world problem back. It may be sufficient to reintroduce some specific hardware characteristics (e.g. physical sequentiality) or other physical characteristics to get a system that performs well enough.
+Every time we exclude(排除) some aspect of a system from our specification(规范) of the system, we risk introducing a source of error and/or a performance issue. That's why sometimes we need to go in the other direction, and selectively introduce some aspects of real hardware and the real-world problem back. It may be sufficient to reintroduce some specific hardware characteristics (e.g. physical sequentiality) or other physical characteristics to get a system that performs well enough.
 
 With this in mind, what is the least amount of reality we can keep around while still working with something that is still recognizable as a distributed system? A system model is a specification of the characteristics we consider important; having specified one, we can then take a look at some impossibility results and challenges.
 
 ## A system model
 
-A key property of distributed systems is distribution. More specifically, programs in a distributed system:
+A key property(特性) of distributed systems is distribution. More specifically, programs in a distributed system:
 
-- run concurrently on independent nodes ...
-- are connected by a network that may introduce nondeterminism and message loss ...
+- run concurrently(并发运行) on independent nodes ...
+- are connected by a network that may introduce nondeterminism(不确定性) and message loss ...
 - and have no shared memory or shared clock.
 
 There are many implications:
@@ -36,15 +36,13 @@ There are many implications:
 - each node executes a program concurrently
 - knowledge is local: nodes have fast access only to their local state, and any information about global state is potentially out of date
 - nodes can fail and recover from failure independently
-- messages can be delayed or lost (independent of node failure; it is not easy to distinguish network failure and node failure)
-- and clocks are not synchronized across nodes (local timestamps do not correspond to the global real time order, which cannot be easily observed)
+- messages can be delayed or lost (independent of node failure; it is not easy to distinguish(区分) network failure and node failure)
+- and clocks are not synchronized across nodes (local timestamps do not correspond to the global real time order, which cannot be easily observed(观察到))
 
-A system model enumerates the many assumptions associated with a particular system design.
+A system model enumerates(列举) the many assumptions associated with a particular system design.
 
-<dl>
-  <dt>System model</dt>
-  <dd>a set of assumptions about the environment and facilities on which a distributed system is implemented</dd>
-</dl>
+> System model
+> a set of assumptions about the environment and facilities on which a distributed system is implemented
 
 System models vary in their assumptions about the environment and facilities. These assumptions include:
 
@@ -52,29 +50,31 @@ System models vary in their assumptions about the environment and facilities. Th
 - how communication links operate and how they may fail and
 - properties of the overall system, such as assumptions about time and order
 
-A robust system model is one that makes the weakest assumptions: any algorithm written for such a system is very tolerant of different environments, since it makes very few and very weak assumptions.
+A robust(健壮的) system model is one that makes the weakest assumptions: any algorithm written for such a system is very tolerant of different environments, since it makes very few and very weak assumptions.
 
-On the other hand, we can create a system model that is easy to reason about by making strong assumptions. For example, assuming that nodes do not fail means that our algorithm does not need to handle node failures. However, such a system model is unrealistic and hence hard to apply into practice.
+On the other hand, we can create a system model that is easy to reason about by making strong assumptions. For example, assuming that nodes do not fail means that our algorithm does not need to handle node failures. However, such a system model is unrealistic(不切实际的) and hence hard to apply into practice.
 
 Let's look at the properties of nodes, links and time and order in more detail.
 
 ### Nodes in our system model
 
-Nodes serve as hosts for computation and storage. They have:
+Nodes serve as hosts for computation and storage.(节点作为计算和存储的主机) They have:
 
 - the ability to execute a program
-- the ability to store data into volatile memory (which can be lost upon failure) and into stable state (which can be read after a failure)
+- the ability to store data into volatile memory(易失性存储器) (which can be lost upon failure) and into stable state (which can be read after a failure)
 - a clock (which may or may not be assumed to be accurate)
 
 Nodes execute deterministic algorithms: the local computation, the local state after the computation, and the messages sent are determined uniquely by the message received and local state when the message was received.
+节点执行决定性的算法：本地计算，计算后的本地状态，发送的消息由接收到的消息和接收到消息时的本地状态唯一确定。
 
-There are many possible failure models which describe the ways in which nodes can fail. In practice, most systems assume a crash-recovery failure model: that is, nodes can only fail by crashing, and can (possibly) recover after crashing at some later point.
+There are many possible failure models which describe the ways in which nodes can fail. In practice(实际上), most systems assume a crash-recovery failure model: that is, nodes can only fail by crashing, and can (possibly) recover after crashing at some later point.
 
-Another alternative is to assume that nodes can fail by misbehaving in any arbitrary way. This is known as [Byzantine fault tolerance](http://en.wikipedia.org/wiki/Byzantine_fault_tolerance). Byzantine faults are rarely handled in real world commercial systems, because algorithms resilient to arbitrary faults are more expensive to run and more complex to implement. I will not discuss them here.
+Another alternative is to assume that nodes can fail by misbehaving in any arbitrary way. This is known as [Byzantine fault tolerance](http://en.wikipedia.org/wiki/Byzantine_fault_tolerance). Byzantine faults are rarely handled in real world commercial systems, because algorithms resilient to arbitrary faults are more expensive to run and more complex to implement.(拜占庭式的错误在现实的商业系统中很少被处理，因为对任意错误能快速恢复的算法运行起来更昂贵，实现起来更复杂) I will not discuss them here.
 
 ### Communication links in our system model
 
 Communication links connect individual nodes to each other, and allow messages to be sent in either direction. Many books that discuss distributed algorithms assume that there are individual links between each pair of nodes, that the links provide FIFO (first in, first out) order for messages, that they can only deliver messages that were sent, and that sent messages can be lost.
+通信链路将各个节点相互连接，并允许消息向任意方向发送。许多讨论分布式算法的书籍都假设每对节点之间有单独的链路，这些链路为消息提供FIFO（先进先出）顺序，它们只能传递已发送的消息，并且已发送的消息可能会丢失。
 
 Some algorithms assume that the network is reliable: that messages are never lost and never delayed indefinitely. This may be a reasonable assumption for some real-world settings, but in general it is preferable to consider the network to be unreliable and subject to message loss and delays.
 

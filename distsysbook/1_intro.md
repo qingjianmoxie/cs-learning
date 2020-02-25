@@ -179,52 +179,54 @@ This is where abstractions and models come into play. Abstractions make things m
 
 A good abstraction makes working with a system easier to understand, while capturing the factors that are relevant for a particular purpose.
 
-There is a tension between the reality that there are many nodes and with our desire for systems that "work like a single system". Often, the most familiar model (for example, implementing a shared memory abstraction on a distributed system) is too expensive.
+There is a tension(矛盾,对立) between the reality that there are many nodes and with our desire for systems that "work like a single system". Often, the most familiar model (for example, implementing a shared memory abstraction on a distributed system) is too expensive.
 
-A system that makes weaker guarantees has more freedom of action, and hence potentially greater performance - but it is also potentially hard to reason about. People are better at reasoning about systems that work like a single system, rather than a collection of nodes.
+A system that makes weaker guarantees has more freedom of action, and hence potentially(潜在的) greater performance - but it is also potentially hard to reason about. People are better at reasoning about systems that work like a single system, rather than a collection of nodes.
 
-One can often gain performance by exposing more details about the internals of the system. For example, in [columnar storage](http://en.wikipedia.org/wiki/Column-oriented_DBMS), the user can (to some extent) reason about the locality of the key-value pairs within the system and hence make decisions that influence the performance of typical queries. Systems which hide these kinds of details are easier to understand (since they act more like single unit, with fewer details to think about), while systems that expose more real-world details may be more performant (because they correspond more closely to reality).
+One can often gain performance by exposing(暴露) more details about the internals of the system. For example, in [columnar storage](http://en.wikipedia.org/wiki/Column-oriented_DBMS), the user can (to some extent) reason about the locality of the key-value pairs within the system and hence make decisions that influence the performance of typical queries. Systems which hide these kinds of details are easier to understand (since they act more like single unit, with fewer details to think about), while systems that expose more real-world details may be more performant (because they correspond(符合) more closely to reality).
 
-Several types of failures make writing distributed systems that act like a single system difficult. Network latency and network partitions (e.g. total network failure between some nodes) mean that a system needs to sometimes make hard choices about whether it is better to stay available but lose some crucial guarantees that cannot be enforced, or to play it safe and refuse clients when these types of failures occur.
+Several types of failures make writing distributed systems that act like a single system difficult. Network latency and network partitions (e.g. total network failure between some nodes) mean that a system needs to sometimes make hard choices about whether it is better to stay available but lose some crucial(关键的) guarantees that cannot be enforced, or to play it safe and refuse(拒绝) clients when these types of failures occur.
 
 The CAP theorem - which I will discuss in the next chapter - captures some of these tensions. In the end, the ideal system meets both programmer needs (clean semantics) and business needs (availability/consistency/latency).
 
-## Design techniques: partition and replicate
+## Design techniques: partition and replicate(复制)
 
 The manner in which a data set is distributed between multiple nodes is very important. In order for any computation to happen, we need to locate the data and then act on it.
+数据集在多个节点之间的分布方式非常重要。为了进行任何计算，我们需要定位数据并对其进行操作。
 
-There are two basic techniques that can be applied to a data set. It can be split over multiple nodes (partitioning) to allow for more parallel processing. It can also be copied or cached on different nodes to reduce the distance between the client and the server and for greater fault tolerance (replication).
+There are two basic techniques that can be applied to a data set. It can be split over multiple nodes (partitioning) to allow for more parallel processing. It can also be copied or cached(缓存) on different nodes to reduce the distance between the client and the server and for greater fault tolerance (replication).
 
 > Divide and conquer - I mean, partition and replicate.
 
 The picture below illustrates the difference between these two: partitioned data (A and B below) is divided into independent sets, while replicated data (C below) is copied to multiple locations.
 
-![Partition and replicate](images/part-repl.png)
+![Partition and replicate](http://book.mixu.net/distsys/images/part-repl.png)
 
-This is the one-two punch for solving any problem where distributed computing plays a role. Of course, the trick is in picking the right technique for your concrete implementation; there are many algorithms that implement replication and partitioning, each with different limitations and advantages which need to be assessed against your design objectives.
+This is the one-two punch(组合拳) for solving any problem where distributed computing plays a role. Of course, the trick is in picking the right technique for your concrete(具体的) implementation; there are many algorithms that implement replication and partitioning, each with different limitations and advantages which need to be assessed against your design objectives.
 
 ### Partitioning
 
 Partitioning is dividing the dataset into smaller distinct independent sets; this is used to reduce the impact of dataset growth since each partition is a subset of the data.
 
 - Partitioning improves performance by limiting the amount of data to be examined and by locating related data in the same partition
-- Partitioning improves availability by allowing partitions to fail independently, increasing the number of nodes that need to fail before availability is sacrificed
+- Partitioning improves availability by allowing partitions to fail independently, increasing the number of nodes that need to fail before availability is sacrificed(牺牲)
 
 Partitioning is also very much application-specific, so it is hard to say much about it without knowing the specifics. That's why the focus is on replication in most texts, including this one.
 
 Partitioning is mostly about defining your partitions based on what you think the primary access pattern will be, and dealing with the limitations that come from having independent partitions (e.g. inefficient access across partitions, different rate of growth etc.).
+分区主要是根据你认为的主要访问模式定义分区，并处理独立分区带来的限制（例如，跨分区的低效访问、不同的增长率等）.
 
 ### Replication
 
 Replication is making copies of the same data on multiple machines; this allows more servers to take part in the computation.
 
-Let me inaccurately quote [Homer J. Simpson](http://en.wikipedia.org/wiki/Homer_vs._the_Eighteenth_Amendment):
+Let me inaccurately(不准确地) quote [Homer J. Simpson](http://en.wikipedia.org/wiki/Homer_vs._the_Eighteenth_Amendment):
 
 > To replication! The cause of, and solution to all of life's problems.
 
 Replication - copying or reproducing something - is the primary way in which we can fight latency.
 
-- Replication improves performance by making additional computing power and bandwidth applicable to a new copy of the data
+- Replication improves performance by making additional computing power and bandwidth(带宽) applicable(适用的) to a new copy of the data
 - Replication improves availability by creating additional copies of the data, increasing the number of nodes that need to fail before availability is sacrificed
 
 Replication is about providing extra bandwidth, and caching where it counts. It is also about maintaining consistency in some way according to some consistency model.
@@ -236,6 +238,7 @@ Replication is also the source of many of the problems, since there are now inde
 The choice of a consistency model is crucial: a good consistency model provides clean semantics for programmers (in other words, the properties it guarantees are easy to reason about) and meets business/design goals such as high availability or strong consistency.
 
 Only one consistency model for replication - strong consistency - allows you to program as-if the underlying data was not replicated. Other consistency models expose some internals of the replication to the programmer. However, weaker consistency models can provide lower latency and higher availability - and are not necessarily harder to understand, just different.
+只有一种一致性模型（强一致性）允许你像底层数据没有被复制一样进行编程。其他的一致性模型向程序员公开了复制的一些内部内容。然而，较弱的一致性模型可以提供较低的延迟和较高的可用性，并且不一定很难理解，只是不同而已。
 
 ---
 
