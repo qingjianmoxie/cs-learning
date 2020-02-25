@@ -76,13 +76,13 @@ Another alternative is to assume that nodes can fail by misbehaving in any arbit
 Communication links connect individual nodes to each other, and allow messages to be sent in either direction. Many books that discuss distributed algorithms assume that there are individual links between each pair of nodes, that the links provide FIFO (first in, first out) order for messages, that they can only deliver messages that were sent, and that sent messages can be lost.
 通信链路将各个节点相互连接，并允许消息向任意方向发送。许多讨论分布式算法的书籍都假设每对节点之间有单独的链路，这些链路为消息提供FIFO（先进先出）顺序，它们只能传递已发送的消息，并且已发送的消息可能会丢失。
 
-Some algorithms assume that the network is reliable: that messages are never lost and never delayed indefinitely. This may be a reasonable assumption for some real-world settings, but in general it is preferable to consider the network to be unreliable and subject to message loss and delays.
+Some algorithms assume that the network is reliable: that messages are never lost and never delayed indefinitely(无限期地). This may be a reasonable assumption for some real-world settings, but in general it is preferable to consider the network to be unreliable and subject to message loss and delays.
 
 A network partition occurs when the network fails while the nodes themselves remain operational. When this occurs, messages may be lost or delayed until the network partition is repaired. Partitioned nodes may be accessible by some clients, and so must be treated differently from crashed nodes. The diagram below illustrates a node failure vs. a network partition:
 
-<img src="images/system-of-2.png" alt="replication" style="max-height: 100px;">
+![](http://book.mixu.net/distsys/images/system-of-2.png)
 
-It is rare to make further assumptions about communication links. We could assume that links only work in one direction, or we could introduce different communication costs (e.g. latency due to physical distance) for different links. However, these are rarely concerns in commercial environments except for long-distance links (WAN latency) and so I will not discuss them here; a more detailed model of costs and topology allows for better optimization at the cost of complexity.
+It is rare to make further assumptions about communication links. We could assume that links only work in one direction, or we could introduce different communication costs (e.g. latency due to physical distance) for different links. However, these are rarely concerns in commercial environments except for long-distance links (WAN广域网 latency) and so I will not discuss them here; a more detailed model of costs and topology(拓扑结构) allows for better optimization at the cost of complexity.
 
 ### Timing / ordering assumptions
 
