@@ -80,33 +80,31 @@ Some algorithms assume that the network is reliable: that messages are never los
 
 A network partition occurs when the network fails while the nodes themselves remain operational. When this occurs, messages may be lost or delayed until the network partition is repaired. Partitioned nodes may be accessible by some clients, and so must be treated differently from crashed nodes. The diagram below illustrates a node failure vs. a network partition:
 
-![](http://book.mixu.net/distsys/images/system-of-2.png)
+![a node failure vs. a network partition](http://book.mixu.net/distsys/images/system-of-2.png)
 
 It is rare to make further assumptions about communication links. We could assume that links only work in one direction, or we could introduce different communication costs (e.g. latency due to physical distance) for different links. However, these are rarely concerns in commercial environments except for long-distance links (WAN广域网 latency) and so I will not discuss them here; a more detailed model of costs and topology(拓扑结构) allows for better optimization at the cost of complexity.
 
 ### Timing / ordering assumptions
 
-One of the consequences of physical distribution is that each node experiences the world in a unique manner. This is inescapable, because information can only travel at the speed of light. If nodes are at different distances from each other, then any messages sent from one node to the others will arrive at a different time and potentially in a different order at the other nodes.
+One of the consequences of physical distribution is that each node experiences the world in a unique manner. This is inescapable(不可避免的), because information can only travel at the speed of light. If nodes are at different distances from each other, then any messages sent from one node to the others will arrive at a different time and potentially in a different order at the other nodes.
 
-Timing assumptions are a convenient shorthand for capturing assumptions about the extent to which we take this reality into account. The two main alternatives are:
+Timing assumptions are a convenient(方便的) shorthand(简略的表达方式) for capturing assumptions about the extent to which we take this reality into account. The two main alternatives are:
 
-<dl>
-  <dt>Synchronous system model</dt>
-  <dd>Processes execute in lock-step; there is a known upper bound on message transmission delay; each process has an accurate clock</dd>
-  <dt>Asynchronous system model</dt>
-  <dd>No timing assumptions - e.g. processes execute at independent rates; there is no bound on message transmission delay; useful clocks do not exist</dd>
-</dl>
+> Synchronous system model
+> Processes execute in lock-step; there is a known upper bound on message transmission delay; each process has an accurate clock
+> Asynchronous system model
+> No timing assumptions - e.g. processes execute at independent rates; there is no bound on message transmission delay; useful clocks do not exist
 
-The synchronous system model imposes many constraints on time and order. It essentially assumes that the nodes have the same experience: that messages that are sent are always received within a particular maximum transmission delay, and that processes execute in lock-step. This is convenient, because it allows you as the system designer to make assumptions about time and order, while the asynchronous system model doesn't.
+The synchronous system model imposes(强加) many constraints on time and order. It essentially(本质上) assumes that the nodes have the same experience: that messages that are sent are always received within a particular maximum transmission delay, and that processes execute in lock-step. This is convenient, because it allows you as the system designer to make assumptions about time and order, while the asynchronous system model doesn't.
 
-Asynchronicity is a non-assumption: it just assumes that you can't rely on timing (or a "time sensor").
+Asynchronicity is a non-assumption: it just assumes that you can't rely on timing (or a "time sensor(时间传感器)").
 
-It is easier to solve problems in the synchronous system model, because assumptions about execution speeds, maximum message transmission delays and clock accuracy all help in solving problems since you can make inferences based on those assumptions and rule out inconvenient failure scenarios by assuming they never occur.
+It is easier to solve problems in the synchronous system model, because assumptions about execution speeds, maximum message transmission delays and clock accuracy(准确) all help in solving problems since you can make inferences(推断) based on those assumptions and rule out inconvenient failure scenarios(设想,方案) by assuming they never occur.
 
-Of course, assuming the synchronous system model is not particularly realistic. Real-world networks are subject to failures and there are no hard bounds on message delay. Real world systems are at best partially synchronous: they may occasionally work correctly and provide some upper bounds, but there will be times where messages are delayed indefinitely and clocks are out of sync. I won't really discuss algorithms for synchronous systems here, but you will probably run into them in many other introductory books because they are analytically easier (but unrealistic).
+Of course, assuming the synchronous system model is not particularly realistic. Real-world networks are subject to failures and there are no hard bounds on message delay. Real world systems are at best(顶多) partially synchronous: they may occasionally(偶尔) work correctly and provide some upper bounds, but there will be times where messages are delayed indefinitely and clocks are out of sync. I won't really discuss algorithms for synchronous systems here, but you will probably run into them in many other introductory books because they are analytically easier (but unrealistic).
 
 
-### The consensus problem
+### The consensus(共识) problem
 
 During the rest of this text, we'll vary the parameters of the system model. Next, we'll look at how varying two system properties:
 
@@ -124,19 +122,19 @@ Several computers (or nodes) achieve consensus if they all agree on some value. 
 3. Termination: All processes eventually reach a decision.
 4. Validity: If all correct processes propose the same value V, then all correct processes decide V.
 
-The consensus problem is at the core of many commercial distributed systems. After all, we want the reliability and performance of a distributed system without having to deal with the consequences of distribution (e.g. disagreements / divergence between nodes), and solving the consensus problem makes it possible to solve several related, more advanced problems such as atomic broadcast and atomic commit.
+The consensus problem is at the core of many commercial distributed systems. After all, we want the reliability(可靠性) and performance of a distributed system without having to deal with the consequences of distribution (e.g. disagreements / divergence between nodes), and solving the consensus problem makes it possible to solve several related, more advanced problems such as atomic broadcast(原子广播) and atomic commit(原子提交).
 
 ### Two impossibility results
 
-The first impossibility result, known as the FLP impossibility result, is an impossibility result that is particularly relevant to people who design distributed algorithms. The second - the CAP theorem - is a related result that is more relevant to practitioners; people who need to choose between different system designs but who are not directly concerned with the design of algorithms.
+The first impossibility result, known as the FLP impossibility result, is an impossibility result that is particularly(特别) relevant to people who design distributed algorithms. The second - the CAP theorem - is a related result that is more relevant to practitioners(从业人员); people who need to choose between different system designs but who are not directly concerned with the design of algorithms.
 
 ## The FLP impossibility result
 
-I will only briefly summarize the [FLP impossibility result](http://en.wikipedia.org/wiki/Consensus_%28computer_science%29#Solvability_results_for_some_agreement_problems), though it is considered to be [more important](http://en.wikipedia.org/wiki/Dijkstra_Prize) in academic circles. The FLP impossibility result (named after the authors, Fischer, Lynch and Patterson) examines the consensus problem under the asynchronous system model (technically, the agreement problem, which is a very weak form of the consensus problem). It is assumed that nodes can only fail by crashing; that the network is reliable, and that the typical timing assumptions of the asynchronous system model hold: e.g. there are no bounds on message delay.
+I will only briefly summarize the [FLP impossibility result](http://en.wikipedia.org/wiki/Consensus_%28computer_science%29#Solvability_results_for_some_agreement_problems), though it is considered to be [more important](http://en.wikipedia.org/wiki/Dijkstra_Prize) in academic circles(学术界). The FLP impossibility result (named after the authors, Fischer, Lynch and Patterson) examines the consensus problem under the asynchronous system model (technically, the agreement problem, which is a very weak form of the consensus problem). It is assumed that nodes can only fail by crashing; that the network is reliable, and that the typical timing assumptions of the asynchronous system model hold: e.g. there are no bounds on message delay.
 
 Under these assumptions, the FLP result states that "there does not exist a (deterministic) algorithm for the consensus problem in an asynchronous system subject to failures, even if messages can never be lost, at most one process may fail, and it can only fail by crashing (stopping executing)".
 
-This result means that there is no way to solve the consensus problem under a very minimal system model in a way that cannot be delayed forever.  The argument is that if such an algorithm existed, then one could devise an execution of that algorithm in which it would remain undecided ("bivalent") for an arbitrary amount of time by delaying message delivery - which is allowed in the asynchronous system model. Thus, such an algorithm cannot exist.
+This result means that there is no way to solve the consensus problem under a very minimal system model in a way that cannot be delayed forever.  The argument(论点) is that if such an algorithm existed, then one could devise(设计) an execution of that algorithm in which it would remain undecided ("bivalent") for an arbitrary amount of time by delaying message delivery - which is allowed in the asynchronous system model. Thus, such an algorithm cannot exist.
 
 This impossibility result is important because it highlights that assuming the asynchronous system model leads to a tradeoff: algorithms that solve the consensus problem must either give up safety or liveness when the guarantees regarding bounds on message delivery do not hold.
 
@@ -150,41 +148,39 @@ The theorem states that of these three properties:
 
 - Consistency: all nodes see the same data at the same time.
 - Availability: node failures do not prevent survivors from continuing to operate.
-- Partition tolerance: the system continues to operate despite message loss due to network and/or node failure
+- Partition tolerance: the system continues to operate despite(尽管) message loss due to network and/or node failure
 
-only two can be satisfied simultaneously. We can even draw this as a pretty diagram, picking two properties out of three gives us three types of systems that correspond to different intersections:
+only two can be satisfied simultaneously(同时). We can even draw this as a pretty diagram, picking two properties out of three gives us three types of systems that correspond to different intersections(交叉点):
 
-![CAP theorem](images/CAP.png)
+![CAP theorem](http://book.mixu.net/distsys/images/CAP.png)
 
 Note that the theorem states that the middle piece (having all three properties) is not achievable. Then we get three different system types:
 
 - CA (consistency + availability). Examples include full strict quorum protocols, such as two-phase commit.
-- CP (consistency + partition tolerance). Examples include majority quorum protocols in which minority partitions are unavailable such as Paxos.
+- CP (consistency + partition tolerance). Examples include majority quorum protocols in which minority(少数) partitions are unavailable such as Paxos.
 - AP (availability + partition tolerance). Examples include protocols using conflict resolution, such as Dynamo.
 
 The CA and CP system designs both offer the same consistency model: strong consistency. The only difference is that a CA system cannot tolerate any node failures; a CP system can tolerate up to `f` faults given `2f+1` nodes in a non-Byzantine failure model (in other words, it can tolerate the failure of a minority `f` of the nodes as long as majority `f+1` stays up). The reason is simple:
 
 - A CA system does not distinguish between node failures and network failures, and hence must stop accepting writes everywhere to avoid introducing divergence (multiple copies). It cannot tell whether a remote node is down, or whether just the network connection is down: so the only safe thing is to stop accepting writes.
-- A CP system prevents divergence (e.g. maintains single-copy consistency) by forcing asymmetric behavior on the two sides of the partition. It only keeps the majority partition around, and requires the minority partition to become unavailable (e.g. stop accepting writes), which retains a degree of availability (the majority partition) and still ensures single-copy consistency.
-
-I'll discuss this in more detail in the chapter on replication when I discuss Paxos. The important thing is that CP systems incorporate network partitions into their failure model and distinguish between a majority partition and a minority partition using an algorithm like Paxos, Raft or viewstamped replication. CA systems are not partition-aware, and are historically more common: they often use the two-phase commit algorithm and are common in traditional distributed relational databases.
+- A CP system prevents(阻止) divergence (e.g. maintains single-copy consistency) by forcing asymmetric behavior on the two sides of the partition. It only keeps the majority partition around, and requires the minority partition to become unavailable (e.g. stop accepting writes), which retains(保持) a degree of availability (the majority partition) and still ensures single-copy consistency.
 
 
+I'll discuss this in more detail in the chapter on replication when I discuss Paxos. The important thing is that CP systems incorporate(包含) network partitions into their failure model and distinguish between a majority partition and a minority partition using an algorithm like Paxos, Raft or viewstamped replication. CA systems are not partition-aware, and are historically more common: they often use the two-phase commit algorithm and are common in traditional distributed relational databases.
 
 Assuming that a partition occurs, the theorem reduces to a binary choice between availability and consistency.
 
-![Based on http://blog.mikiobraun.de/2013/03/misconceptions-about-cap-theorem.html](images/CAP_choice.png)
+![Based on http://blog.mikiobraun.de/2013/03/misconceptions-about-cap-theorem.html](http://book.mixu.net/distsys/images/CAP_choice.png)
 
-
-I think there are four conclusions that should be drawn from the CAP theorem:
+I think there are four conclusions(结论) that should be drawn from the CAP theorem:
 
 First, that *many system designs used in early distributed relational database systems did not take into account partition tolerance* (e.g. they were CA designs). Partition tolerance is an important property for modern systems, since network partitions become much more likely if the system is geographically distributed (as many large systems are).
 
 Second, that *there is a tension between strong consistency and high availability during network partitions*. The CAP theorem is an illustration of the tradeoffs that occur between strong guarantees and distributed computation.
 
-In some sense, it is quite crazy to promise that a distributed system consisting of independent nodes connected by an unpredictable network "behaves in a way that is indistinguishable from a non-distributed system".
+In some sense, it is quite crazy to promise that a distributed system consisting of independent nodes connected by an unpredictable network "behaves in a way that is indistinguishable(无法区分的) from a non-distributed system".
 
-![From the Simpsons episode Trash of the Titans](images/news_120.jpg)
+![From the Simpsons episode Trash of the Titans](http://book.mixu.net/distsys/images/news_120.jpg)
 
 Strong consistency guarantees require us to give up availability during a partition. This is because one cannot prevent divergence between two replicas that cannot communicate with each other while continuing to accept writes on both sides of the partition.
 
