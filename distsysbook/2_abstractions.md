@@ -165,7 +165,6 @@ The CA and CP system designs both offer the same consistency model: strong consi
 - A CA system does not distinguish between node failures and network failures, and hence must stop accepting writes everywhere to avoid introducing divergence (multiple copies). It cannot tell whether a remote node is down, or whether just the network connection is down: so the only safe thing is to stop accepting writes.
 - A CP system prevents(阻止) divergence (e.g. maintains single-copy consistency) by forcing asymmetric behavior on the two sides of the partition. It only keeps the majority partition around, and requires the minority partition to become unavailable (e.g. stop accepting writes), which retains(保持) a degree of availability (the majority partition) and still ensures single-copy consistency.
 
-
 I'll discuss this in more detail in the chapter on replication when I discuss Paxos. The important thing is that CP systems incorporate(包含) network partitions into their failure model and distinguish between a majority partition and a minority partition using an algorithm like Paxos, Raft or viewstamped replication. CA systems are not partition-aware, and are historically more common: they often use the two-phase commit algorithm and are common in traditional distributed relational databases.
 
 Assuming that a partition occurs, the theorem reduces to a binary choice between availability and consistency.
@@ -182,46 +181,36 @@ In some sense, it is quite crazy to promise that a distributed system consisting
 
 ![From the Simpsons episode Trash of the Titans](http://book.mixu.net/distsys/images/news_120.jpg)
 
-Strong consistency guarantees require us to give up availability during a partition. This is because one cannot prevent divergence between two replicas that cannot communicate with each other while continuing to accept writes on both sides of the partition.
+Strong consistency guarantees require us to give up availability during a partition. This is because one cannot prevent divergence between two replicas(副本) that cannot communicate with each other while continuing to accept writes on both sides of the partition.
 
-How can we work around this? By strengthening the assumptions (assume no partitions) or by weakening the guarantees. Consistency can be traded off against availability (and the related capabilities of offline accessibility and low latency). If "consistency" is defined as something less than "all nodes see the same data at the same time" then we can have both availability and some (weaker) consistency guarantee.
+How can we work around this? By strengthening(加强) the assumptions (assume no partitions) or by weakening the guarantees. Consistency can be traded off against availability (and the related capabilities of offline accessibility and low latency). If "consistency" is defined as something less than "all nodes see the same data at the same time" then we can have both availability and some (weaker) consistency guarantee.
 
 Third, that *there is a tension between strong consistency and performance in normal operation*.
 
 Strong consistency / single-copy consistency requires that nodes communicate and agree on every operation. This results in high latency during normal operation.
 
-If you can live with a consistency model other than the classic one, a consistency model that allows replicas to lag or to diverge, then you can reduce latency during normal operation and maintain availability in the presence of partitions.
+If you can live with a consistency model other than the classic one, a consistency model that allows replicas to lag(滞后) or to diverge(分叉), then you can reduce latency during normal operation and maintain availability in the presence of partitions.
 
 When fewer messages and fewer nodes are involved, an operation can complete faster. But the only way to accomplish that is to relax the guarantees: let some of the nodes be contacted less frequently, which means that nodes can contain old data.
 
-This also makes it possible for anomalies to occur. You are no longer guaranteed to get the most recent value. Depending on what kinds of guarantees are made, you might read a value that is older than expected, or even lose some updates.
+This also makes it possible for anomalies(异常) to occur. You are no longer guaranteed to get the most recent value. Depending on what kinds of guarantees are made, you might read a value that is older than expected, or even lose some updates.
 
+Fourth - and somewhat indirectly - that *if we do not want to give up availability during a network partition, then we need to explore(探索) whether consistency models other than strong consistency are workable for our purposes*.
 
+For example, even if user data is georeplicated to multiple datacenters, and the link between those two datacenters is temporarily out of order, in many cases we'll still want to allow the user to use the website / service. This means reconciling(协调) two divergent sets of data later on, which is both a technical challenge and a business risk. But often both the technical challenge and the business risk are manageable(可控的), and so it is preferable to provide high availability.
 
+Consistency and availability are not really binary choices, unless you limit yourself to strong consistency. But strong consistency is just one consistency model: the one where you, by necessity, need to give up availability in order to prevent more than a single copy of the data from being active. As [Brewer himself points out](http://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed), the "2 out of 3" interpretation(解释) is misleading(误导).
 
+If you take away(拿走) just one idea from this discussion, let it be this: "consistency" is not a singular, unambiguous(明确的) property. Remember:
 
-Fourth - and somewhat indirectly - that *if we do not want to give up availability during a network partition, then we need to explore whether consistency models other than strong consistency are workable for our purposes*.
-
-For example, even if user data is georeplicated to multiple datacenters, and the link between those two datacenters is temporarily out of order, in many cases we'll still want to allow the user to use the website / service. This means reconciling two divergent sets of data later on, which is both a technical challenge and a business risk. But often both the technical challenge and the business risk are manageable, and so it is preferable to provide high availability.
-
-Consistency and availability are not really binary choices, unless you limit yourself to strong consistency. But strong consistency is just one consistency model: the one where you, by necessity, need to give up availability in order to prevent more than a single copy of the data from being active. As [Brewer himself points out](http://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed), the "2 out of 3" interpretation is misleading.
-
-If you take away just one idea from this discussion, let it be this: "consistency" is not a singular, unambiguous property. Remember:
-
-<blockquote>
-  <p>
-   [ACID](http://en.wikipedia.org/wiki/ACID) consistency != <br>
-   [CAP](http://en.wikipedia.org/wiki/CAP_theorem) consistency != <br>
-   [Oatmeal](http://en.wikipedia.org/wiki/Oatmeal) consistency
-  </p>
-</blockquote>
+> [ACID](http://en.wikipedia.org/wiki/ACID) consistency !=  
+> [CAP](http://en.wikipedia.org/wiki/CAP_theorem) consistency !=  
+> [Oatmeal](http://en.wikipedia.org/wiki/Oatmeal) consistency
 
 Instead, a consistency model is a guarantee - any guarantee - that a data store gives to programs that use it.
 
-<dl>
-  <dt>Consistency model</dt>
-  <dd>a contract between programmer and system, wherein the system guarantees that if the programmer follows some specific rules, the results of operations on the data store will be predictable</dd>
-</dl>
+> Consistency model  
+> a contract(契约) between programmer and system, wherein the system guarantees that if the programmer follows some specific rules, the results of operations on the data store will be predictable(可预测的)
 
 The "C" in CAP is "strong consistency", but "consistency" is not a synonym for "strong consistency".
 
@@ -233,15 +222,15 @@ Consistency models can be categorized into two types: strong and weak consistenc
 
 - Strong consistency models (capable of maintaining a single copy)
   - Linearizable consistency
-  - Sequential consistency
+  - Sequential consistency(顺序一致性)
 - Weak consistency models (not strong)
   - Client-centric consistency models
-  - Causal consistency: strongest model available
+  - Causal consistency(因果一致性): strongest model available
   - Eventual consistency models
 
 Strong consistency models guarantee that the apparent order and visibility of updates is equivalent to a non-replicated system. Weak consistency models, on the other hand, do not make such guarantees.
 
-Note that this is by no means an exhaustive list. Again, consistency models are just arbitrary contracts between the programmer and system, so they can be almost anything.
+Note that this is by no means(绝不) an exhaustive(详尽的) list. Again, consistency models are just arbitrary contracts between the programmer and system, so they can be almost anything.
 
 ### Strong consistency models
 
@@ -250,11 +239,12 @@ Strong consistency models can further be divided into two similar, but slightly 
 - *Linearizable consistency*: Under linearizable consistency, all operations **appear** to have executed atomically in an order that is consistent with the global real-time ordering of operations. (Herlihy & Wing, 1991)
 - *Sequential consistency*: Under sequential consistency, all operations **appear** to have executed atomically in some order that is consistent with the order seen at individual nodes and that is equal at all nodes. (Lamport, 1979)
 
-The key difference is that linearizable consistency requires that the order in which operations take effect is equal to the actual real-time ordering of operations. Sequential consistency allows for operations to be reordered as long as the order observed on each node remains consistent. The only way someone can distinguish between the two is if they can observe all the inputs and timings going into the system; from the perspective of a client interacting with a node, the two are equivalent.
+The key difference is that linearizable consistency requires that the order in which operations take effect is equal to the actual real-time ordering of operations. Sequential consistency allows for operations to be reordered as long as the order observed on each node remains consistent(一致的). The only way someone can distinguish between the two is if they can observe all the inputs and timings going into the system; from the perspective of a client interacting with a node, the two are equivalent.
 
-The difference seems immaterial, but it is worth noting that sequential consistency does not compose.
+The difference seems immaterial(不重要), but it is worth noting that sequential consistency does not compose.
 
 Strong consistency models allow you as a programmer to replace a single server with a cluster of distributed nodes and not run into any problems.
+强一致性模型允许你作为程序员用分布式节点集群替换单个服务器，而不会遇到任何问题.
 
 All the other consistency models have anomalies (compared to a system that guarantees strong consistency), because they behave in a way that is distinguishable from a non-replicated system. But often these anomalies are acceptable, either because we don't care about occasional issues or because we've written code that deals with inconsistencies after they have occurred in some way.
 
@@ -262,9 +252,10 @@ Note that there really aren't any universal typologies for weak consistency mode
 
 ### Client-centric consistency models
 
-*Client-centric consistency models* are consistency models that involve the notion of a client or session in some way. For example, a client-centric consistency model might guarantee that a client will never see older versions of a data item. This is often implemented by building additional caching into the client library, so that if a client moves to a replica node that contains old data, then the client library returns its cached value rather than the old value from the replica.
+*Client-centric consistency models* are consistency models that involve the notion(观念) of a client or session in some way. For example, a client-centric consistency model might guarantee that a client will never see older versions of a data item. This is often implemented by building additional caching into the client library, so that if a client moves to a replica node that contains old data, then the client library returns its cached value rather than the old value from the replica.
 
 Clients may still see older versions of the data, if the replica node they are on does not contain the latest version, but they will never see anomalies where an older version of a value resurfaces (e.g. because they connected to a different replica). Note that there are many kinds of consistency models that are client-centric.
+如果客户机所在的副本节点不包含最新版本，则客户机可能仍会看到较旧版本的数据，但他们永远不会看到值的较旧版本重新出现的异常情况（例如，因为它们连接到不同的副本）。请注意，有很多种以客户机为中心的一致性模型。
 
 ### Eventual consistency
 

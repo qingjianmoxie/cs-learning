@@ -1,18 +1,18 @@
-# %chapter_number%. Time and order
+# 3. Time and order
 
 What is order and why is it important?
 
 What do you mean "what is order"?
 
-I mean, why are we so obsessed with order in the first place? Why do we care whether A happened before B? Why don't we care about some other property, like "color"?
+I mean, why are we so obsessed(着迷的) with order in the first place? Why do we care whether A happened before B? Why don't we care about some other property, like "color"?
 
 Well, my crazy friend, let's go back to the definition of distributed systems to answer that.
 
 As you may remember, I described distributed programming as the art of solving the same problem that you can solve on a single computer using multiple computers.
 
-This is, in fact, at the core of the obsession with order. Any system that can only do one thing at a time will create a total order of operations. Like people passing through a single door, every operation will have a well-defined predecessor and successor. That's basically the programming model that we've worked very hard to preserve.
+This is, in fact, at the core of the obsession with order. Any system that can only do one thing at a time will create a total order of operations. Like people passing through a single door, every operation will have a well-defined predecessor(前任) and successor(继任者). That's basically the programming model that we've worked very hard to preserve(维护).
 
-The traditional model is: a single program, one process, one memory space running on one CPU. The operating system abstracts away the fact that there might be multiple CPUs and multiple programs, and that the memory on the computer is actually shared among many programs. I'm not saying that threaded programming and event-oriented programming don't exist; it's just that they are special abstractions on top of the "one/one/one" model. Programs are written to be executed in an ordered fashion: you start from the top, and then go down towards the bottom.
+The traditional model is: a single program, one process, one memory space running on one CPU. The operating system abstracts away the fact that there might be multiple CPUs and multiple programs, and that the memory on the computer is actually shared among many programs. I'm not saying that threaded programming and event-oriented programming(面向事件的编程) don't exist; it's just that they are special abstractions on top of the "one/one/one" model. Programs are written to be executed in an ordered fashion: you start from the top, and then go down towards the bottom.
 
 Order as a property has received so much attention because the easiest way to define "correctness" is to say "it works like it would on a single machine". And that usually means that a) we run the same operations and b) that we run them in the same order - even if there are multiple machines.
 
@@ -25,10 +25,11 @@ In reality, a distributed program runs on multiple nodes; with multiple CPUs and
 The natural state in a distributed system is [partial order](http://en.wikipedia.org/wiki/Partially_ordered_set). Neither the network nor independent nodes make any guarantees about relative order; but at each node, you can observe a local order.
 
 A [total order](http://en.wikipedia.org/wiki/Total_order) is a binary relation that defines an order for every element in some set.
+总体顺序是一个二元关系, 它为某个集合中的每个元素定义一个顺序.
 
-Two distinct elements are **comparable** when one of them is greater than the other. In a partially ordered set, some pairs of elements are not comparable and hence a partial order doesn't specify the exact order of every item.
+Two distinct elements are **comparable** when one of them is greater than the other. In a partially ordered set, some pairs of elements are not comparable and hence a partial order doesn't specify the exact order of every item.在偏序集中，某些元素对是不可比较的，因此偏序并不能指定每个项的确切顺序。
 
-Both total order and partial order are [transitive](http://en.wikipedia.org/wiki/Transitive_relation) and [antisymmetric](http://en.wikipedia.org/wiki/Antisymmetric_relation). The following statements hold in both a total order and a partial order for all a, b and c in X:
+Both total order and partial order are [transitive](http://en.wikipedia.org/wiki/Transitive_relation)(传递的) and [antisymmetric](http://en.wikipedia.org/wiki/Antisymmetric_relation)(反对称的). The following statements hold in both a total order and a partial order for all a, b and c in X:
 
     If a ≤ b and b ≤ a then a = b (antisymmetry);
     If a ≤ b and b ≤ c then a ≤ c (transitivity);
@@ -41,10 +42,10 @@ while a partial order is only [reflexive](http://en.wikipedia.org/wiki/Reflexive
 
     a ≤ a (reflexivity) for all a in X
 
-Note that totality implies reflexivity; so a partial order is a weaker variant of total order.
+Note that totality implies reflexivity(自反性); so a partial order is a weaker variant(变体) of total order.
 For some elements in a partial order, the totality property does not hold - in other words, some of the elements are not comparable.
 
-Git branches are an example of a partial order. As you probably know, the git revision control system allows you to create multiple branches from a single base branch - e.g. from a master branch. Each branch represents a history of source code changes derived based on a common ancestor:
+Git branches are an example of a partial order. As you probably know, the git revision(修改) control system allows you to create multiple branches from a single base branch - e.g. from a master branch. Each branch represents(代表) a history of source code changes derived based on a common ancestor:
 
     [ branch A (1,2,0)]  [ master (3,0,0) ]  [ branch B (1,0,2) ]
     [ branch A (1,1,0)]  [ master (2,0,0) ]  [ branch B (1,0,1) ]
@@ -52,17 +53,17 @@ Git branches are an example of a partial order. As you probably know, the git re
 
 The branches A and B were derived from a common ancestor, but there is no definite order between them: they represent different histories and cannot be reduced to a single linear history without additional work (merging). You could, of course, put all the commits in some arbitrary order (say, sorting them first by ancestry and then breaking ties by sorting A before B or B before A) - but that would lose information by forcing a total order where none existed.
 
-In a system consisting of one node, a total order emerges by necessity: instructions are executed and messages are processed in a specific, observable order in a single program. We've come to rely on this total order - it makes executions of programs predictable. This order can be maintained on a distributed system, but at a cost: communication is expensive, and time synchronization is difficult and fragile.
+In a system consisting of one node, a total order emerges by necessity: instructions(指令) are executed and messages are processed in a specific, observable order in a single program. We've come to rely on this total order - it makes executions of programs predictable. This order can be maintained on a distributed system, but at a cost: communication is expensive, and time synchronization is difficult and fragile(脆弱的).
 
 # What is time?
 
-Time is a source of order - it allows us to define the order of operations - which coincidentally also has an interpretation that people can understand (a second, a minute, a day and so on).
+Time is a source of order - it allows us to define the order of operations - which coincidentally also has an interpretation(解释) that people can understand (a second, a minute, a day and so on).
 
-In some sense, time is just like any other integer counter. It just happens to be important enough that most computers have a dedicated time sensor, also known as a clock. It's so important that we've figured out how to synthesize an approximation of the same counter using some imperfect physical system (from wax candles to cesium atoms). By "synthesize", I mean that we can approximate the value of the integer counter in physically distant places via some physical property without communicating it directly.
+In some sense, time is just like any other integer counter. It just happens to be important enough that most computers have a dedicated(专用的) time sensor, also known as a clock. It's so important that we've figured out how to synthesize(合成) an approximation of the same counter using some imperfect physical system (from wax candles(蜡烛) to cesium atoms(铯原子)). By "synthesize", I mean that we can approximate the value of the integer counter in physically distant places via some physical property without communicating it directly.
 
-Timestamps really are a shorthand value for representing the state of the world from the start of the universe to the current moment - if something occurred at a particular timestamp, then it was potentially influenced by everything that happened before it. This idea can be generalized into a causal clock that explicitly tracks causes (dependencies) rather than simply assuming that everything that preceded a timestamp was relevant. Of course, the usual assumption is that we should only worry about the state of the specific system rather than the whole world.
+Timestamps really are a shorthand value for representing the state of the world from the start of the universe to the current moment - if something occurred at a particular timestamp, then it was potentially influenced by everything that happened before it. This idea can be generalized into a causal(因果) clock that explicitly(明确地) tracks causes (dependencies) rather than simply assuming that everything that preceded a timestamp was relevant. Of course, the usual assumption is that we should only worry about the state of the specific system rather than the whole world.
 
-Assuming that time progresses at the same rate everywhere - and that is a big assumption which I'll return to in a moment - time and timestamps have several useful interpretations when used in a program. The three interpretations are:
+Assuming that time progresses(流逝) at the same rate everywhere - and that is a big assumption which I'll return to in a moment - time and timestamps have several useful interpretations(解释) when used in a program. The three interpretations are:
 
 - Order
 - Duration
@@ -72,7 +73,7 @@ Assuming that time progresses at the same rate everywhere - and that is a big as
 
 - we can attach timestamps to unordered events to order them
 - we can use timestamps to enforce a specific ordering of operations or the delivery of messages (for example, by delaying an operation if it arrives out of order)
-- we can use the value of a timestamp to determine whether something happened chronologically before something else
+- we can use the value of a timestamp to determine whether something happened chronologically(按时间顺序地) before something else
 
 *Interpretation* - time as a universally comparable value. The absolute value of a timestamp can be interpreted as a date, which is useful for people. Given a timestamp of when a downtime started from a log file, you can tell that it was last Saturday, when there was a [thunderstorm](https://twitter.com/AWSFail/statuses/218915147060752384).
 
