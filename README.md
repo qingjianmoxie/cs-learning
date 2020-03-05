@@ -17,7 +17,6 @@
     * [使用Flex](编译原理/使用Flex.md)
     * [使用Bison](编译原理/使用Bison.md)
 * [MySQL](MySQL/README.md)
-    * [源码阅读1](MySQL/源码阅读1.md)
 * [Linux](Linux/README.md)
     * [解压压缩命令](Linux/解压压缩命令.md)
     * [core dump](Linux/core_dump.md)
