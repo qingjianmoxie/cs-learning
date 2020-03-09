@@ -333,3 +333,7 @@ end_io_cache()函数是IO_CACHE的析构函数，该函数主要是将write_buff
 ## 结论
 
 通过以上分析发现，IO_CACHE数据结构及提供的相关处理方法，通过将读/写的数据首先从加载或者写入到CACHE中，可以有效提高IO的读写效率。尤其对于数据长度远远小于IO_SIZE大小的数据进行读写时，IO的读写性能有明显提高。从应用场景来看，IO_CACHE几乎应用在所有IO相关处理的情况下，主要包括：log子系统（error log、general log、binlog等日志子系统）、myisam存储引擎、replication子系统等等。
+
+## 文章来源
+
+[MySQL数据结构分析—IO_CACHE](http://blog.chinaunix.net/uid-26896862-id-3432594.html)
