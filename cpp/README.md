@@ -24,5 +24,7 @@
   * [deque](./deque.md)
   * [函数对象](./函数对象.md)
   * [容器适配器](./容器适配器.md)
+  * [pair](./pair.md)
+  * [map](./map.md)
 
 * [Google C++ 风格指南](./c++风格指南.md)
