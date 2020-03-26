@@ -134,3 +134,9 @@ map同multimap的不同在于，map不允许有两个元素的first值相等，�
 +  push_back()：在容器末尾增加新元素。
 +  pop_back()：删除容器末尾的元素。
 +  insert(...)：插入一个或多个元素。该函数参数较复杂，此处省略。
+
+## 链接
+
+- [目录](README.md)
+- 上一节：[STL标准模板库](./STL标准模板库.md)
+- 下一章：[STL迭代器 iterator](./STL迭代器iterator.md)
