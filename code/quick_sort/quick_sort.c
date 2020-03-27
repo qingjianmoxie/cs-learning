@@ -1,6 +1,26 @@
 /* 快速排序 */
-
+#include <stdio.h>
 typedef int ElementType;
+
+void InsertionSort(ElementType A[], int N)
+{
+    // 第一个元素相当于有序, 所以P从1开始, 而不用从0开始
+    for (int P = 1; P < N; P++)
+    {
+        ElementType Tmp = A[P]; /* 摸下一张牌 */
+        int i;
+        for (i = P; i > 0 && A[i - 1] > Tmp; i--)
+            A[i] = A[i - 1]; /* 移出空位 */
+        A[i] = Tmp;          /* 新牌落位 */
+    }
+}
+
+void Swap(ElementType *a, ElementType *b)
+{
+    ElementType t = *a;
+    *a = *b;
+    *b = t;
+}
 
 ElementType Median3(ElementType A[], int Left, int Right)
 {
@@ -49,4 +69,17 @@ void Qsort(ElementType A[], int Left, int Right)
 void QuickSort(ElementType A[], int N)
 { /* 统一接口 */
     Qsort(A, 0, N - 1);
+}
+
+int main(void)
+{
+    int arr[4] = {10, 5, 2, 3};
+    QuickSort(arr, 4);
+    // Print result
+    for (int i = 0; i < 4; i++)
+    {
+        printf("%d ", arr[i]);
+    }
+
+    return 0;
 }
