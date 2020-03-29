@@ -139,4 +139,4 @@ map同multimap的不同在于，map不允许有两个元素的first值相等，�
 
 - [目录](README.md)
 - 上一节：[STL标准模板库](./STL标准模板库.md)
-- 下一章：[STL迭代器 iterator](./STL迭代器iterator.md)
+- 下一节：[STL迭代器 iterator](./STL迭代器iterator.md)

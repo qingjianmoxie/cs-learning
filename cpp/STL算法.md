@@ -85,3 +85,9 @@ void sort(_RandIt first, _RandIt last);
 int a[4] = {3, 4, 2, 1};
 sort(a, a+4);
 ```
+
+## 链接
+
+- [目录](README.md)
+- 上一节：[STL迭代器 iterator](./STL迭代器iterator.md)
+- 下一节：[STL中“大”、“小”和“相等”的概念](./STL中“大”、“小”和“相等”的概念.md)

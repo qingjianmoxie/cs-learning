@@ -121,3 +121,9 @@ int main(int argc, char **argv) {
 ## 文章来源
 
 [C++ pair的基本用法总结（整理）](https://blog.csdn.net/sevenjoin/article/details/81937695)
+
+## 链接
+
+- [目录](README.md)
+- 上一节：[容器适配器](./容器适配器.md)
+- 下一节：[map](./map.md)

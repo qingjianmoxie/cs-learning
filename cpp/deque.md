@@ -8,3 +8,9 @@ void push_front (const T & val);  //将val插入容器的头部
 void pop_front();  //删除容器头部的元素
 ```
 思考题：猜想一下，deque 是如何实现它相比 vector 的优势的？
+
+## 链接
+
+- [目录](README.md)
+- 上一节：[list](./list.md)
+- 下一节：[函数对象](./函数对象.md)

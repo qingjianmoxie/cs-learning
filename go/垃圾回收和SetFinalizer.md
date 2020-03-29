@@ -34,4 +34,4 @@ runtime.SetFinalizer(obj, func(obj *typeObj))
 
 - [目录](README.md)
 - 上一节：[类型的 String() 方法和格式化描述符](./类型的String()方法和格式化描述符.md)
-- 下一章：[接口（Interfaces）与反射（reflection）](./接口与反射.md)
+- 下一节：[接口（Interfaces）与反射（reflection）](./接口与反射.md)

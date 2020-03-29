@@ -384,3 +384,8 @@ pr.first 是容器中元素的一个迭代器，因此 pr.first->second 可以�
     Mark Time                       32
 
 这些元素是以键的升序排列的，因为容器中的元素是使用`less<Name>`进行排序的。`Name::operator<()`先比较姓，在姓相同时才比较名。这导致返回的姓名是正常的顺序。
+
+## 链接
+
+- [目录](README.md)
+- 上一节：[pair](./pair.md)
