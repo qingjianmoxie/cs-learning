@@ -2,6 +2,7 @@
 
 * [数据类型](./数据类型.md)
 * [SQL解析概述](./SQL解析概述.md)
+* [String](./String.md)
 * [源码阅读1](./源码阅读1.md)
 * [数据结构分析 - sql_list](./数据结构分析-sql_list.md)
 * [数据结构分析 - MEM_ROOT](./数据结构分析-MEM_ROOT.md)
