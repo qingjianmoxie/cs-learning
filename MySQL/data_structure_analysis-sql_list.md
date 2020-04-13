@@ -58,40 +58,41 @@ ilink代码如下所示：
 /*
   A simple intrusive list which automaticly removes element from list
   on delete (for THD element)
+  NOTE: this inherently unsafe, since we rely on <T> to have
+  the same layout as ilink<T> (see base_ilist::sentinel).
+  Please consider using a different strategy for linking objects.
 */
 
-struct ilink
+template <typename T>
+class ilink
 {
-  struct ilink **prev,*next;
-  static void *operator new(size_t size) throw ()
-  {
-    return (void*)my_malloc((uint)size, MYF(MY_WME | MY_FAE | ME_FATALERROR));
-  }
-  static void operator delete(void* ptr_arg, size_t size)
-  {
-     my_free(ptr_arg);
-  }
+  T **prev, *next;
+public:
+  ilink() : prev(NULL), next(NULL) {}
 
-  inline ilink()
-  {
-    prev=0; next=0;
-  }
-  inline void unlink()
+  void unlink()
   {
     /* Extra tests because element doesn't have to be linked */
     if (prev) *prev= next;
     if (next) next->prev=prev;
-    prev=0 ; next=0;
+    prev= NULL;
+    next= NULL;
   }
+
   virtual ~ilink() { unlink(); }		/*lint -e1740 */
+
+  friend class base_ilist<T>;
+  friend class base_ilist_iterator<T>;
 };
 ```
 
 在实际的实现中，为了适用于不同数据结构，链表结构设计并没有那么简单。以下是整个单向链表数据结构的UML设计图，其中：
 Sql_alloc数据结构定义了内存分配相关的操作；
 ```c++
-/* mysql standard class memory allocator */
-
+/**
+  MySQL standard memory allocator class. You have to inherit the class
+  in order to use it.
+*/
 class Sql_alloc
 {
 public:
@@ -107,20 +108,14 @@ public:
   { return alloc_root(mem_root, size); }
   static void *operator new(size_t size, MEM_ROOT *mem_root) throw ()
   { return alloc_root(mem_root, size); }
-  static void operator delete(void *ptr, size_t size) { TRASH(ptr, size); }
+  static void operator delete(void *ptr, size_t size)
+  { if (ptr != NULL) TRASH(ptr, size); }
   static void operator delete(void *ptr, MEM_ROOT *mem_root)
   { /* never called */ }
   static void operator delete[](void *ptr, MEM_ROOT *mem_root)
   { /* never called */ }
-  static void operator delete[](void *ptr, size_t size) { TRASH(ptr, size); }
-#ifdef HAVE_valgrind
-  bool dummy;
-  inline Sql_alloc() :dummy(0) {}
-  inline ~Sql_alloc() {}
-#else
-  inline Sql_alloc() {}
-  inline ~Sql_alloc() {}
-#endif
+  static void operator delete[](void *ptr, size_t size)
+  { if (ptr != NULL) TRASH(ptr, size); }
 };
 ```
 SQL_I_List是SQL相关的链表结构，该结构是泛型类型，应用于TABLE_LIST、ORDER等数据结构；
