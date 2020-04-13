@@ -9,11 +9,26 @@ MySQL的SQL层基本是C++代码，因此数据结构不是单纯的存储结构
 在SQL层，MySQL的链表结构包括两类：单项链表结构和双向链表结构。以下分别对这两种链表进行分析：
 
 **单向链表**：base_list是链表的头结点，first和last分别指向链表的第一个和最后一个结点，elements表示链表中的结点个数；
-list_node是链表中的结点，next指向下一个结点的地址，info指针指向存储数据的具体地址。list_node代码如下：
+list_node是链表中的结点，next指向下一个结点的地址，info指针指向存储数据的具体地址。
+
+![图1 单向链表结构](http://blog.chinaunix.net/attachment/201301/22/26896862_13588291054Kgg.jpg)
+图1 单向链表结构
+
+list_node代码如下：
 ```c++
+/*
+  Basic single linked list
+  Used for item and item_buffs.
+  All list ends with a pointer to the 'end_of_list' element, which
+  data pointer is a null pointer and the next pointer points to itself.
+  This makes it very fast to traverse lists as we don't have to
+  test for a specialend condition for list that can't contain a null
+  pointer.
+*/
+
 /**
   list_node - a node of a single-linked list.
-  @note We never call a destructor for instances of this class.
+  @note We never call a destructor(析构函数) for instances of this class.
 */
 
 struct list_node :public Sql_alloc
@@ -31,12 +46,13 @@ struct list_node :public Sql_alloc
 };
 ```
 
-![图1 单向链表结构](http://blog.chinaunix.net/attachment/201301/22/26896862_13588291054Kgg.jpg)
-图1 单向链表结构
-
 **双向链表**：base_ilist是双向链表的头结点，first和last指针分别指向双向链表的第一个和最后一个结点；
 ilink是双向链表中结点的数据结构，prev指针指向结点的前驱结点，next指向当前结点的下一个结点。
 与单向链表不同的是：base_ilist头结点中没有表示链表中数据结点个数的变量，这与ilink结点的结构相关；ilink结点中没有指向存储数据的结点指针，这是考虑到该结构可以链接任意数据结构，具体数据结构类型和数据的内容，双向链表都不关心，这也解释了头结点中没有必要记录数据结点的个数。
+
+![图2 双向链表结构](http://blog.chinaunix.net/attachment/201301/22/26896862_13588291176S84.jpg)
+图2 双向链表结构
+
 ilink代码如下所示：
 ```c++
 /*
@@ -70,9 +86,6 @@ struct ilink
   virtual ~ilink() { unlink(); }		/*lint -e1740 */
 };
 ```
-
-![图2 双向链表结构](http://blog.chinaunix.net/attachment/201301/22/26896862_13588291176S84.jpg)
-图2 双向链表结构
 
 在实际的实现中，为了适用于不同数据结构，链表结构设计并没有那么简单。以下是整个单向链表数据结构的UML设计图，其中：
 Sql_alloc数据结构定义了内存分配相关的操作；
