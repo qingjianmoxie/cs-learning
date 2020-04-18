@@ -1,6 +1,6 @@
 ## map是什么
 
-map是STL的一个关联容器，它提供一对一（其中第一个可以称为关键字，每个关键字只能在map中出现一次，第二个可能称为该关键字的值）的数据 处理能力，由于这个特性，它完成有可能在我们处理一对一数据的时候，在编程上提供快速通道。这里说下map内部数据的组织，map内部自建一颗红黑树(一种非严格意义上的平衡二叉树)，这颗树具有对数据自动排序的功能，所以在map内部所有的数据都是有序的，后边我们会见识到有序的好处。
+map是STL的一个关联容器，它提供一对一（其中第一个可以称为关键字，每个关键字只能在map中出现一次，第二个可能称为该关键字的值）的数据处理能力。这里说下map内部数据的组织，map内部自建一颗红黑树(一种非严格意义上的平衡二叉树)，这颗树具有对数据自动排序的功能，所以在map内部所有的数据都是有序的，后边我们会见识到有序的好处。
 
 `map<K,T>`类模板定义在 map 文件头中，它定义了一个保存 T 类型对象的 map，每个 T 类型的对象都有一个关联的 K 类型的键。容器内对象的位置是通过比较键决定的。可以用适当的键值从 map 容器中检索对象。图 1 展示了一个用名称作为键的 `map<K,T>` 容器，对象是整数值，用来表示年龄。
 
@@ -37,8 +37,6 @@ public:
 
 图 2 所示的树有 3 层，所以从根节点开始，找到任意的元素最多需要 3 步。这里选择的根节点可以使树的高度最小，而且对于每个父节点来说，它的键值大于它的左子节点，但小于它的右子节点。为了保持二叉树的平衡，当添加一个新的元素时，可能会导致根节点发生改变。所以显然，在添加新元素时，为了保持树的平衡，会产生一些额外的开销。作为回报，容器中的元素越多，相对于线性排列和非平衡树，平衡树组织元素的效率也越高。从包含 n 个元素的平衡二叉树中检索一个随机元素所需的时间为 O(log<sub>2</sub>n)，从序列中检索元素所需的时间为 O(n)。
 
-注意，O(n) 计算时间随着参数的增加而增加。O 被认为是有序的，O(n) 表明线性执行时间在以 n 增加。O(log<sub>2</sub>n) 计算时间远没有 n 增加得快，因为它是以 log<sub>2</sub>n 计算的。
-
 ## map的创建
 
 map 类模板有 4 个类型参数，但一般只需要指定前两个模板参数的值。第 1 个是键的类型，第 2 个是所保存对象的类型，第 3 个和第 4 个模板参数分别定义了用来比较键的函数对象的类型以及为 map 分配内存的对象的类型。最后两个参数有默认值。在本节稍后部分会展示如何定义不同类型的比较键的函数对象，但不会定义可替代的分配器类型。
@@ -51,7 +49,7 @@ std::map<std::string, size_t>  people;
 
 第 1 个模板类型参数指定键的类型是字符串，第 2 个模板类型参数指定值的类型为 size_t。当然，这里的模板类型参数可以是任何类型，唯一的要求是键必须可以用 `less<K>` 比或用自己指定的另一个函数对象来替代。
 
-`map<K,T>`中的每个元素都是同时封装了对象及其键的`pair<const K, T>`类型对象，这里不能修改 const K。`pair<T1,T2>`类的模板定义在 utility 头文件中，它被包含在 map 头文件中。因此 people 容器中的元素是`pair<const string, size_t>`类型的。`pair<T1，T2>`这种模板类型并不是专门在这种情况下使用的。必要时可以用它将两个不同类型的对象组装成一个对象。本章稍后将讲解更多这方面的内容。
+`map<K,T>`中的每个元素都是同时封装了对象及其键的`pair<const K, T>`类型对象，这里不能修改 const K。`pair<T1,T2>`类的模板定义在 utility 头文件中，它被包含在 map 头文件中。因此 people 容器中的元素是`pair<const string, size_t>`类型的。`pair<T1，T2>`这种模板类型并不是专门在这种情况下使用的。必要时可以用它将两个不同类型的对象组装成一个对象。
 
 我们可以用初始化列表来指定 map 的初始值，但因为 map 中包含的是 `pair<const K, T>` 类型的元素，所以初始化列表中的值也必须是这种类型。下面展示了如何为 people 容器设置初始值：
 ```c++
@@ -81,7 +79,9 @@ map 容器 personnel 包含 people 元素的副本。
 std::map<std::string, size_t>  personnel {std::begin(people),std::end(people)};
 ```
 
-这样就生成了 personnel，并且用 people 容器的迭代器指定的元素对它进行了初始化。map 容器提供了双向迭代器，这样就可以通过自增或自减访问元素。map 容器还提供了反向迭代器，所以可以从最后一个元素遍历到第一个元素。personnel 容器包含的元素和 people 完全相同。当然，也可以用另一个容器的元素子集来创建容器：
+这样就生成了 personnel，并且用 people 容器的迭代器指定的元素对它进行了初始化。map 容器提供了双向迭代器，这样就可以通过自增或自减访问元素。map 容器还提供了反向迭代器，所以可以从最后一个元素遍历到第一个元素。personnel 容器包含的元素和 people 完全相同。
+
+当然，也可以用另一个容器的元素子集来创建容器：
 ```c++
 std::map<std::string,size_t>  personnel {++std::begin(people),std::end(people)};
 ```
@@ -91,31 +91,32 @@ std::map<std::string,size_t>  personnel {++std::begin(people),std::end(people)};
 `map<K,T>`容器的成员函数 insert() 有多个版本，它们可以在 map 中插入一个或多个`pair<const K,T>`对象。只能插入 map 中不存在的元素。下面这个代码片段展示了如何插入单个元素：
 
 ```c++
-std::map<std::string, size_t> people{std::make_pair("Ann", 25), std::make_pair("Bill", 46), std::make_pair("Jack", 32), std::make_pair("Jill", 32)};
-auto pr = std::make_pair("Fred", 22); //Create a pair element and insert it
+map<string, size_t> people{make_pair("Ann", 25), make_pair("Bill", 46), make_pair("Jack", 32), make_pair("Jill", 32)};
+auto pr = make_pair("Fred", 22); //Create a pair element and insert it
 auto ret_pr = people.insert(pr);
-std::cout << ret_pr.first->first << " " << ret_pr.first->second << "" << std::boolalpha << ret_pr.second << "\n"; // Fred 22 true
+cout << ret_pr.first->first << " " << ret_pr.first->second << "" << std::boolalpha << ret_pr.second << "\n"; // Fred 22 true
 ```
 
-第一条语句生成了一个 map 容器，并用初始化列表中的 4 个值对它进行了初始化；在这种情况下，这些值会被隐式转换为要求的类型。第二条语句生成了另一个被插入的 pair 对象 pr。pr 对象的类型是`pair<const char*,int>`，因为`make_pair<>()`函数模板的类型参数是从参数类型推断出来的；但是在 insert() 操作中，这个对象会被隐式转换为容器元素类型。当然，如果不想依靠隐式转换，可以生成所要求类型的pair对象：
+第一条语句生成了一个 map 容器，并用初始化列表中的 4 个值对它进行了初始化；在这种情况下，这些值会被隐式转换为要求的类型。
+第二条语句生成了另一个被插入的 pair 对象 pr。pr 对象的类型是`pair<const char*,int>`，因为`make_pair<>()`函数模板的类型参数是从参数类型推断出来的；但是在 insert() 操作中，这个对象会被隐式转换为容器元素类型。当然，如果不想依靠隐式转换，可以生成所要求类型的pair对象：
 ```c++
-auto pr = std::make_pair<std:: string, size_t> (std:: string {"Fred"},22);
+auto pr = make_pair<string, size_t> (string{"Fred"},22);
 ```
 
 `make_pair<>()`模板的显式类型参数决定了返回的 pair 对象的类型。可以把文字字符串作为第一个参数，然后通过隐式转换创建键需要的字符串对象。可以省略 make_pair<>() 的模板类型参数，让编译器去推断它们。假设像下面这样声明：
 
 ```c++
-auto pr = std::make_pair("Fred",22) ; // pair<const char*, int>
+auto pr = make_pair("Fred",22) ; // pair<const char*, int>
 ```
 
 这里会返回和所要求类型不同的 pair 对象。当允许编译器推断模板参数类型时，make_pair() 的参数可以准确地确定模板参数的类型。第一个参数是一个`const char*`类型的字符串，第二个参数是 int 类型。尽管已经说明了元素的类型，但在这种情况下，并没有多大的用处，因为在插入一个新元素时，pair 对象可以被隐式转换为容器所需类型。当 make_pair() 的参数的类型不能隐式转换成容器的键和对象的类型时，就需要注意了。
 
 成员函数 insert() 会返回一个`pair<iterator,bool>`对象。对象的成员 first 是一个迭代器，它要么指向插入元素，要么指向阻止插入的元素。如果 map 中已经保存了一个和这个键相同的对象，就会出现后面这种情况。这个对象的成员变量 second (布尔型)是返回对象，如果插入成功，返回值为 true，否则为 false。
 
-输出语句像我们看到的那样，访问插入 pair 的成员变量 first 的表达式是 ret_pr.first->first。ret_pr 的成员变量 first 是一个指向 pair 对象的迭代器，所以可以使用`->`操作符来访问它的成员变量 first。输出展示了插入的元素。可以通过下面这个循环进行验证：
+输出语句像我们看到的那样，访问插入 pair 的成员变量 first 的表达式是 `ret_pr.first->first`。ret_pr 的成员变量 first 是一个指向 pair 对象的迭代器，所以可以使用`->`操作符来访问它的成员变量 first。输出展示了插入的元素。可以通过下面这个循环进行验证：
 ```c++
 for (const auto& p : people)
-std::cout << std::setw(10) << std::left << p.first << " "<< p.second <<"\n";
+    cout << std::setw(10) << std::left << p.first << " "<< p.second <<"\n";
 ```
 
 循环变量 p 通过引用依次访问 map 容器 people 中的每个元素。输出如下：
@@ -132,8 +133,8 @@ Jill 32
 通过执行下面这两条语句，可以看出元素插入后的效果：
 
 ```c++
-ret_pr = people.insert(std::make_pair("Bill", 48));
-std:: cout << ret_pr.first->first <<" "<<ret_pr.first->second<< " "<<std::boolalpha<<ret_pr.second << "\n"; // Bill 46 false
+ret_pr = people.insert(make_pair("Bill", 48));
+cout << ret_pr.first->first <<" "<<ret_pr.first->second<< " "<<std::boolalpha<<ret_pr.second << "\n"; // Bill 46 false
 ```
 
 程序会输出如注释所示的内容。insert() 返回了一个 pair 对象 ret_pr，它的成员变量 first 指向 map 中已有的和键匹配的元素，成员变量 second 为 false，表明元素没有插入成功。
@@ -145,12 +146,12 @@ if(!ret_pr.second) // If the element is there change the age
     ret_pr.first—>second = 48;
 ```
 
-当键已经存在于 map 容器中时，ret_pr 的成员变量 second为false，所以这段代码会将 map 中这个元素的成员变量 second 的值设为 48。
+当键已经存在于 map 容器中时，ret_pr 的成员变量second为false，所以这段代码会将 map 中这个元素的成员变量 second 的值设为 48。
 
 可以用 pair 构造函数生成的对象作为 insert() 的参数：
 
 ```c++
-ret_pr = people.insert(std::pair<const std::string, size_t> {"Bill", 48});
+ret_pr = people.insert(pair<const string, size_t> {"Bill", 48});
 ```
 
 这里会调用一个具有右值引用参数的 insert() 版本，所以假如元素不在容器中，那么它会被移到容器中。
@@ -158,8 +159,8 @@ ret_pr = people.insert(std::pair<const std::string, size_t> {"Bill", 48});
 也可以提供一个提示符来指出元素插入的位置。提示符是迭代器的形式，它指向容器中的一个现有元素，通常从提示符指示的位置开始查找新元素的插入位置。好的提示符可以提高插入操作的速度，反之亦然。例如：
 
 ```c++
-auto ret_pr = people.insert(std::make_pair("Jim", 48));
-people.insert (ret_pr.first, std::make_pair ("Ian", 38)）；
+auto ret_pr = people.insert(make_pair("Jim", 48));
+people.insert(ret_pr.first, make_pair ("Ian", 38));
 ```
 
 第一条语句插入了一个元素，并像前面那样返回了一个对象。pair 对象的成员变量 first 是一个指向被插入的元素或容器中与插入元素有相同键的元素的迭代器。
@@ -170,17 +171,17 @@ people.insert (ret_pr.first, std::make_pair ("Ian", 38)）；
 
 ```c++
 if (!people.count("Ian"))
-    people.insert (ret_pr.first, std::make_pair ("Ian", 38));
+    people.insert (ret_pr.first, make_pair ("Ian", 38));
 ```
 
-只有当 count() 函数返回 0 时，insert() 才会被调用，这说明“Ian”键不在 map 中。当然，在不用提示插入元素时，需要做一次这样的检查，但 insert() 的返回值不管怎样都能告诉我们插入结果。
+只有当 count() 函数返回 0 时，insert() 才会被调用，这说明"Ian"键不在 map 中。当然，在不用提示插入元素时，需要做一次这样的检查，但 insert() 的返回值不管怎样都能告诉我们插入结果。
 
 也可以将外部源中的一段元素插入 map 中，这些元素不必来自另一个 map 容器，但必须和被插入容器中的元素是同类型。这里有一些示例：
 
 ```c++
-std::map<std::string, size_t> crowd{{"May", 55}, {"Pat", 66}, {"Al", 22}, {"Ben", 44}};
+map<string, size_t> crowd{{"May", 55}, {"Pat", 66}, {"Al", 22}, {"Ben", 44}};
 auto iter = std::begin(people);
-std::advance(iter, 4);                    // begin iterator+ 4
+std::advance(iter, 4);                    // begin iterator + 4
 crowd.insert(++std::begin(people), iter); // Insert 2nd, 3rd, and 4th elements from people
 ```
 
