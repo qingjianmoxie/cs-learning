@@ -176,6 +176,13 @@ if (!people.count("Ian"))
 
 只有当 count() 函数返回 0 时，insert() 才会被调用，这说明"Ian"键不在 map 中。当然，在不用提示插入元素时，需要做一次这样的检查，但 insert() 的返回值不管怎样都能告诉我们插入结果。
 
+判断插入的关键字是否重复也可以使用find函数:
+
+```c++
+if(people.find("Ian") == people.end()) // 没有找到
+    people.insert (ret_pr.first, make_pair ("Ian", 38));
+```
+
 也可以将外部源中的一段元素插入 map 中，这些元素不必来自另一个 map 容器，但必须和被插入容器中的元素是同类型。这里有一些示例：
 
 ```c++
