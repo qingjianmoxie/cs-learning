@@ -22,6 +22,7 @@ void Swap(ElementType *a, ElementType *b)
     *b = t;
 }
 
+// 取头、中、尾的中位数
 ElementType Median3(ElementType A[], int Left, int Right)
 {
     int Center = (Left + Right) / 2;
@@ -39,19 +40,18 @@ ElementType Median3(ElementType A[], int Left, int Right)
 
 void Qsort(ElementType A[], int Left, int Right)
 { /* 核心递归函数 */
-    int Pivot;
     const int Cutoff = 1000;
 
     if (Cutoff <= Right - Left)
     {                                    /* 如果序列元素充分多，进入快排 */
-        Pivot = Median3(A, Left, Right); /* 选基准 */
+        int Pivot = Median3(A, Left, Right); /* 选基准 */
         int Low = Left;
         int High = Right - 1;
         while (1)
         { /*将序列中比基准小的移到基准左边，大的移到右边*/
-            while (A[++Low] < Pivot)
+            while (A[++Low] < Pivot) //Low从Left+1开始
                 ;
-            while (A[--High] > Pivot)
+            while (A[--High] > Pivot) // High从Right-2开始
                 ;
             if (Low < High)
                 Swap(&A[Low], &A[High]);
