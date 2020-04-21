@@ -10,19 +10,26 @@ MEM_ROOT的数据结构定义在mysql源码的/include/my_alloc.h文件中。其
 typedef struct st_used_mem
 {				   /* struct for once_alloc (block) */
   struct st_used_mem *next;	   /* Next block in use */
-  size_t left;                     /* memory left in block  */
-  size_t size;                     /* size of block */
+  unsigned int	left;		   /* memory left in block  */
+  unsigned int	size;		   /* size of block */
 } USED_MEM;
+```
 
+首先，分析一下USED_MEM数据结构，该结构包含三个参数:  
+next表示下一个USED_MEM对象，是一个链式结构;  
+left表示当前内存块中剩余的内存空间;  
+size表示内存块分配的大小。  
+通过USED_MEM数据结构，就可以将分配的内存块连接成一个链表，供内存分配使用。
 
+```c++
 typedef struct st_mem_root
 {
-  USED_MEM *free;                  /* blocks with free memory in it (free block link list的链表头指针) */
-  USED_MEM *used;                  /* blocks almost without free memory (used block link list的链表头指针) */
+  USED_MEM *free;                  /* blocks with free memory in it */
+  USED_MEM *used;                  /* blocks almost without free memory */
   USED_MEM *pre_alloc;             /* preallocated block (预先分配的block) */
   /* if block have less memory it will be put in 'used' list */
-  size_t min_malloc;               /* 如果block剩下的可用空间小于该值，将会从free list移动到used list */
-  size_t block_size;               /* initial block size (每次初始化的空间大小) */
+  size_t min_malloc;
+  size_t block_size;               /* initial block size */
   unsigned int block_num;          /* allocated blocks counter (记录实际的block数量,初始化为4) */
   /* 
      first free block in queue test counter (if it exceed 
@@ -30,15 +37,28 @@ typedef struct st_mem_root
   */
   unsigned int first_block_usage;  /* free list中的第一个block 测试不满足分配空间大小的次数 */
 
+  /*
+    Maximum amount of memory this mem_root can hold. A value of 0
+    implies there is no limit.
+  */
+  size_t max_capacity;
+
+  /* Allocated size for this mem_root */
+
+  size_t allocated_size;
+
+  /* Enable this for error reporting if capacity is exceeded */
+  my_bool error_for_capacity_exceeded;
+
   void (*error_handler)(void);     /* 分配失败的错误处理函数 */
+
+  PSI_memory_key m_psi_key;
 } MEM_ROOT;
 ```
 
-首先，分析一下USED_MEM数据结构，该结构包含三个参数：next表示下一个USED_MEM对象，是一个链式结构；left表示当前内存块中剩余的内存空间；size表示内存块分配的大小。通过USED_MEM数据结构，就可以将分配的内存块连接成一个链表，供内存分配使用。
-
-MEM_ROOT数据结构定义了三个USED_MEM指针，其中free表示有空闲内存的内存块；
-used表示几乎没有空闲内存块，之所以是几乎没有，是因为当first_block_usage大于10，并且内存剩余的内存大小left小于4096时，free列表中的内存块就会被插入used列表；
-pre_alloc表示预分配的内存块列表。
+MEM_ROOT数据结构定义了三个USED_MEM指针，其中free表示有空闲内存的内存块;  
+used表示几乎没有空闲内存块，之所以是几乎没有，是因为当first_block_usage大于10，并且内存剩余的内存大小left小于4096时，free列表中的内存块就会被插入used列表;  
+pre_alloc表示预分配的内存块列表。  
 此外，MEM_ROOT定义了最小分配的内存大小min_malloc；初始化内存块的大小block_size；内存块数block_num；之前提到的first_block_usage参数，用于判断free内存块测试次数；以及错误处理函数指针，用于处理内存分配出错时的处理过程。
 
 ## 源码实现
@@ -47,7 +67,12 @@ pre_alloc表示预分配的内存块列表。
 
 ### init_alloc_root()函数
 
-`init_alloc_root()`初始化函数，主要对MEM_ROOT的参数进行初始化，默认设置参数min_malloc的值为32，参数block_num的值为4，参数block_size的值为输入参数block_size的大小减去常量值ALLOC_ROOT_MIN_BLOCK_SIZE（该常量包含USED_MEM的大小、常量MALLOC_OVERHEAD值为8，以及最小block的大小8）。以下是pre_alloc_size为0，init_alloc_root()函数的初始化状态。
+`init_alloc_root()`初始化函数，主要对MEM_ROOT的参数进行初始化，默认设置参数min_malloc的值为32，参数block_num的值为4，参数block_size的值为输入参数block_size的大小减去常量值ALLOC_ROOT_MIN_BLOCK_SIZE.
+ALLOC_ROOT_MIN_BLOCK_SIZE包含USED_MEM的大小、常量MALLOC_OVERHEAD值为8，以及最小block的大小8。
+```c++
+#define ALLOC_ROOT_MIN_BLOCK_SIZE (MALLOC_OVERHEAD + sizeof(USED_MEM) + 8)
+```
+以下是pre_alloc_size为0，init_alloc_root()函数的初始化状态。
 
 | | |
 | :- | :-
