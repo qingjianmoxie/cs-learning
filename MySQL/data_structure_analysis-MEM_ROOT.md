@@ -4,6 +4,17 @@
 
 ## 数据结构
 
+在具体分析之前, 我们先例举在结构体使用过程中用到的一些宏:
+```c
+#define MY_ALIGN(A,L)	(((A) + (L) - 1) & ~((L) - 1))
+#define ALIGN_SIZE(A)	MY_ALIGN((A),sizeof(double))
+```
+这个宏在`my_global.h`中定义, 作用是字节对齐. 不了解字节对齐的点[这里](../c/字节对齐.md).
+首先思考一下`a & ~1`的作用是什么?
+上面的代码是使数a的最低位置0.
+`~1`是对1求反, 按8位二进制位算, `~1`相当于`1111 1110`, 将其与a进行`&`与运算, a的最低位就成了0.
+在宏`ALIGN_SIZE(A)`中, `sizeof(double)`为8, `& ~(sizeof(double) - 1)`相当于将数的最低三位置0, 也就是按8字节对齐.
+
 MEM_ROOT的数据结构定义在mysql源码的/include/my_alloc.h文件中。其中，MEM_ROOT中使用了一个重要数据结构：USED_MEM，该结构是已分配的内存块对象。
 
 ```c++
@@ -106,7 +117,6 @@ init_alloc_root()代码如下
                         should be no less than ALLOC_ROOT_MIN_BLOCK_SIZE)
       pre_alloc_size - if non-0, then size of block that should be
                        pre-allocated during memory root initialization.
-      my_flags	       MY_THREAD_SPECIFIC flag for my_malloc
 
   DESCRIPTION
     This function prepares memory root for further use, sets initial size of
@@ -114,38 +124,36 @@ init_alloc_root()代码如下
     Altough error can happen during execution of this function if
     pre_alloc_size is non-0 it won't be reported. Instead it will be
     reported as error in first alloc_root() on this memory root.
-
-    We don't want to change the structure size for MEM_ROOT.
-    Because of this, we store in MY_THREAD_SPECIFIC as bit 1 in block_size
 */
 
-void init_alloc_root(MEM_ROOT *mem_root, size_t block_size,
-		     size_t pre_alloc_size __attribute__((unused)),
-                     myf my_flags)
+void init_alloc_root(PSI_memory_key key,
+                     MEM_ROOT *mem_root, size_t block_size,
+		     size_t pre_alloc_size MY_ATTRIBUTE((unused)))
 {
   DBUG_ENTER("init_alloc_root");
   DBUG_PRINT("enter",("root: 0x%lx", (long) mem_root));
 
   mem_root->free= mem_root->used= mem_root->pre_alloc= 0;
   mem_root->min_malloc= 32;
-  mem_root->block_size= (block_size - ALLOC_ROOT_MIN_BLOCK_SIZE) & ~1;  // & ~1的作用是使二进制数的最低位为0
-  if (MY_TEST(my_flags & MY_THREAD_SPECIFIC))
-    mem_root->block_size|= 1;
-
+  mem_root->block_size= block_size - ALLOC_ROOT_MIN_BLOCK_SIZE;
   mem_root->error_handler= 0;
   mem_root->block_num= 4;			/* We shift this with >>2 */
   mem_root->first_block_usage= 0;
+  mem_root->m_psi_key= key;
+  mem_root->max_capacity= 0;
+  mem_root->allocated_size= 0;
+  mem_root->error_for_capacity_exceeded= FALSE;
 
-#if !(defined(HAVE_valgrind) && defined(EXTRA_DEBUG))
+#if defined(PREALLOCATE_MEMORY_CHUNKS)
   if (pre_alloc_size)
   {
     if ((mem_root->free= mem_root->pre_alloc=
-	 (USED_MEM*) my_malloc(pre_alloc_size+ ALIGN_SIZE(sizeof(USED_MEM)),
-			       MYF(my_flags))))
+	 (USED_MEM*) my_malloc(key, pre_alloc_size+ ALIGN_SIZE(sizeof(USED_MEM)), MYF(0))))
     {
-      mem_root->free->size= pre_alloc_size+ALIGN_SIZE(sizeof(USED_MEM));
-      mem_root->free->left= pre_alloc_size;
+      mem_root->free->size= (uint)(pre_alloc_size+ALIGN_SIZE(sizeof(USED_MEM)));
+      mem_root->free->left= (uint)pre_alloc_size;
       mem_root->free->next= 0;
+      mem_root->allocated_size+= pre_alloc_size+ ALIGN_SIZE(sizeof(USED_MEM));
     }
   }
 #endif
@@ -155,7 +163,10 @@ void init_alloc_root(MEM_ROOT *mem_root, size_t block_size,
 
 ### alloc_root()函数
 
-`alloc_root()`函数式MEM_ROOT最核心的函数，用于内存的分配。该函数的处理逻辑为：首先查看free内存列表中，是否有符合分配长度的block块。如果不存在，那么重新申请内存空间，生成一个新的block块。否则，从找到的block块上分配内存空间，并返回当前block剩余的首地址，并修改left值。如果分配后，该block块的值小于参数min_malloc的值，那么将该block添加到used内存列表中。特别注意的是，在查看free内存列表时，如果free中第一个block的first_block_usage值大于10次（即第一个block块查找分配失败次数大于10次），并且left的空间小于4096时，将该block添加到used列表中。
+`alloc_root()`函数式MEM_ROOT最核心的函数，用于内存的分配。该函数的处理逻辑为:  
+首先查看free内存列表中，是否有符合分配长度的block块。如果不存在，那么重新申请内存空间，生成一个新的block块。  
+否则，从找到的block块上分配内存空间，并返回当前block剩余的首地址，并修改left值。如果分配后，该block块的值小于参数min_malloc的值，那么将该block添加到used内存列表中。  
+特别注意的是，在查看free内存列表时，如果free中第一个block的first_block_usage值大于10次（即第一个block块查找分配失败次数大于10次），并且left的空间小于4096时，将该block添加到used列表中。
 
 具体处理逻辑的简化流程图如下所示：
 
@@ -168,8 +179,8 @@ void *alloc_root(MEM_ROOT *mem_root, size_t length)
 {
   size_t get_size, block_size;
   uchar* point;
-  reg1 USED_MEM *next= 0;
-  reg2 USED_MEM **prev;
+  USED_MEM *next= 0;
+  USED_MEM **prev;
   DBUG_ENTER("alloc_root");
   DBUG_PRINT("enter",("root: 0x%lx", (long) mem_root));
   DBUG_ASSERT(alloc_root_inited(mem_root));
@@ -200,37 +211,42 @@ void *alloc_root(MEM_ROOT *mem_root, size_t length)
   }
   if (! next)
   {						/* Time to alloc new block */
-    block_size= (mem_root->block_size & ~1) * (mem_root->block_num >> 2);
+    block_size= mem_root->block_size * (mem_root->block_num >> 2);
     get_size= length+ALIGN_SIZE(sizeof(USED_MEM));
     get_size= MY_MAX(get_size, block_size);
 
-    if (!(next = (USED_MEM*) my_malloc(get_size,
-                                       MYF(MY_WME | ME_FATALERROR |
-                                           MALLOC_FLAG(mem_root->
-                                                       block_size)))))
+    if (!is_mem_available(mem_root, get_size))
+    {
+      if (mem_root->error_for_capacity_exceeded)
+        my_error(EE_CAPACITY_EXCEEDED, MYF(0),
+                 (ulonglong) mem_root->max_capacity);
+      else
+        DBUG_RETURN(NULL);
+    }
+    if (!(next = (USED_MEM*) my_malloc(mem_root->m_psi_key,
+                                       get_size,MYF(MY_WME | ME_FATALERROR))))
     {
       if (mem_root->error_handler)
 	(*mem_root->error_handler)();
       DBUG_RETURN((void*) 0);                      /* purecov: inspected */
     }
+    mem_root->allocated_size+= get_size;
     mem_root->block_num++;
     next->next= *prev;
-    next->size= get_size;
-    /* bug:如果该block是通过mem_root->block_size * (mem_root->block_num >> 2)计算出来的，则已经去掉了ALIGN_SIZE(sizeof(USED_MEM)，这里重复了。 */
-    next->left= get_size-ALIGN_SIZE(sizeof(USED_MEM));
+    next->size= (uint)get_size;
+    next->left= (uint)(get_size-ALIGN_SIZE(sizeof(USED_MEM)));
     *prev=next;
   }
 
   point= (uchar*) ((char*) next+ (next->size-next->left));
   /*TODO: next part may be unneded due to mem_root->first_block_usage counter*/
-  if ((next->left-= length) < mem_root->min_malloc)
+  if ((next->left-= (uint)length) < mem_root->min_malloc)
   {						/* Full block */
     *prev= next->next;				/* Remove block from list */
     next->next= mem_root->used;
     mem_root->used= next;
     mem_root->first_block_usage= 0;
   }
-  TRASH_ALLOC(point, length);
   DBUG_PRINT("exit",("ptr: 0x%lx", (ulong) point));
   DBUG_RETURN((void*) point);
 }
@@ -238,7 +254,9 @@ void *alloc_root(MEM_ROOT *mem_root, size_t length)
 
 ### free_root()函数
 
-`free_root()`函数主要用于释放分配的内存空间。但是该函数根据输入不同的标志，用于释放内存的方式有些不同。该函数的处理逻辑为：如果输入的标志仅仅用于标示该内存空间为释放，而不是真正的释放内存，那么调用mark_blocks_free()函数标记所有的空间已经释放，以便于重用。否则，如果输入的标志不需要保留预分配的内存空间，那么预分配空间置为空，并分别释放used和free列表中的block内存列表。
+`free_root()`函数主要用于释放分配的内存空间。但是该函数根据输入不同的标志，用于释放内存的方式有些不同。该函数的处理逻辑为:  
+如果输入的标志仅仅用于标示该内存空间为释放，而不是真正的释放内存，那么调用mark_blocks_free()函数标记所有的空间已经释放，以便于重用。  
+否则，如果输入的标志不需要保留预分配的内存空间，那么预分配空间置为空，并分别释放used和free列表中的block内存列表。
 
 具体处理逻辑的简化流程图如图4所示：
 
@@ -264,13 +282,13 @@ free_root()代码如下:
 
   NOTES
     One can call this function either with root block initialised with
-    init_alloc_root() or with a bzero()-ed block.
+    init_alloc_root() or with a zero()-ed block.
     It's also safe to call this multiple times with the same mem_root.
 */
 
 void free_root(MEM_ROOT *root, myf MyFlags)
 {
-  reg1 USED_MEM *next,*old;
+  USED_MEM *next,*old;
   DBUG_ENTER("free_root");
   DBUG_PRINT("enter",("root: 0x%lx  flags: %u", (long) root, (uint) MyFlags));
 
@@ -286,22 +304,33 @@ void free_root(MEM_ROOT *root, myf MyFlags)
   {
     old=next; next= next->next ;
     if (old != root->pre_alloc)
+    {
+      old->left= old->size;
+      TRASH_MEM(old);
       my_free(old);
+    }
   }
   for (next=root->free ; next ;)
   {
     old=next; next= next->next;
     if (old != root->pre_alloc)
+    {
+      old->left= old->size;
+      TRASH_MEM(old);
       my_free(old);
+    }
   }
   root->used=root->free=0;
   if (root->pre_alloc)
   {
     root->free=root->pre_alloc;
-    root->free->left=root->pre_alloc->size-ALIGN_SIZE(sizeof(USED_MEM));
+    root->free->left=root->pre_alloc->size-(uint)ALIGN_SIZE(sizeof(USED_MEM));
+    root->allocated_size= root->pre_alloc->size;
     TRASH_MEM(root->pre_alloc);
     root->free->next=0;
   }
+  else
+    root->allocated_size= 0;
   root->block_num= 4;
   root->first_block_usage= 0;
   DBUG_VOID_RETURN;
@@ -316,3 +345,4 @@ MEM_ROOT的内存分配采用的是启发式分配算法，随着后续block的�
 ## 文章来源
 
 [MySQL数据结构分析--MEM_ROOT](http://blog.chinaunix.net/uid-26896862-id-3412033.html)
+[细说MySQL 之MEM_ROOT](http://blog.chinaunix.net/uid-20708886-id-5581118.html)
