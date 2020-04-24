@@ -35,34 +35,29 @@
 class Solution {
 public:
     ListNode* rotateRight(ListNode* head, int k) {
-        ListNode *dummy = new ListNode(-1);
-        dummy->next = head;
-        int count = 0;
-        ListNode *p = head;
+        if (NULL == head || NULL == head->next)
+            return head;
+        int count = 1;
+        ListNode *move = head;
         ListNode *tail = head;
-        while (p)
+        while (move->next)
         {
             count++;
-            tail = p;
-            p = p->next;
+            move = move->next;
         }
-        if (0 == count)
-            return NULL;
+        // 此时move指向最后一个节点
+        move->next = head;
         int i = k % count;
-        if (0 == i)
-            return head;
-        int id = count - i;
-        p = head;
-        for (int tmp = 1; tmp < id; tmp++)
+        if (i)
         {
-            p = p->next;
+            int id = count - i;
+            for (int tmp = 0; tmp < id; tmp++)
+            {
+                move = move->next;
+            }
         }
-        dummy->next = p->next;
-        p->next = NULL;
-        tail->next = head;
-
-        ListNode *retNode = dummy->next;
-        delete dummy;
+        ListNode *retNode = move->next;
+        move->next = NULL;
         return retNode;
     }
 };
