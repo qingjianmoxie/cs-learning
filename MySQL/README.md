@@ -13,4 +13,6 @@
 
 
 # Oracle
+
 * [TO_CHAR(datetime)](./TO_CHAR(datetime).md)
+* [LISTAGG](./LISTAGG.md)
