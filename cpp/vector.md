@@ -1,3 +1,142 @@
+# std::vector
+
+定义于头文件 [`<vector>`](https://zh.cppreference.com/w/cpp/header/vector)
+
+```c++
+template<
+    class T,
+    class Allocator = std::allocator<T>
+> class vector;
+```
+[std::allocator](http://zh.cppreference.com/w/cpp/memory/allocator)
+
+`std::vector` 是封装动态数组的顺序容器。
+
+```c++
+namespace pmr {
+    template <class T>
+    using vector = std::vector<T, std::pmr::polymorphic_allocator<T>>;
+}
+
+// (C++17 起) 
+```
+[std::pmr::polymorphic_allocator](http://zh.cppreference.com/w/cpp/memory/polymorphic_allocator)
+
+`std::pmr::vector` 是使用[多态分配器](https://zh.cppreference.com/w/cpp/memory/polymorphic_allocator)的模板别名。
+
+元素相继存储，这意味着不仅可通过迭代器，还能用指向元素的常规指针访问元素。这意味着指向 vector 元素的指针能传递给任何期待指向数组元素的指针的函数。(C++03 起)
+
+vector 的存储是自动管理的，按需扩张收缩。 vector 通常占用多于静态数组的空间，因为要分配更多内存以管理将来的增长。 vector 所用的方式不在每次插入元素时，而只在额外内存耗尽时重分配。分配的内存总量可用 [capacity()](https://zh.cppreference.com/w/cpp/container/vector/capacity) 函数查询。额外内存可通过对 [shrink_to_fit()](https://zh.cppreference.com/w/cpp/container/vector/shrink_to_fit) 的调用返回给系统。 (C++11 起)
+
+重分配通常是性能上有开销的操作。若元素数量已知，则 [reserve()](https://zh.cppreference.com/w/cpp/container/vector/reserve) 函数可用于消除重分配。
+
+vector 上的常见操作复杂度（效率）如下：
+
+* 随机访问——常数 O(1)
+* 在末尾插入或移除元素——均摊常数 O(1)
+* 插入或移除元素——与到 vector 结尾的距离成线性 O(n)
+
+`std::vector` （对于 `bool` 以外的 `T` ）满足[*容器* (Container)](https://zh.cppreference.com/w/cpp/named_req/Container)、[*具分配器容器* (AllocatorAwareContainer)](https://zh.cppreference.com/w/cpp/named_req/AllocatorAwareContainer)、[*序列容器* (SequenceContainer)](https://zh.cppreference.com/w/cpp/named_req/SequenceContainer)、[*连续容器* (ContiguousContainer)](https://zh.cppreference.com/w/cpp/named_req/ContiguousContainer)(C++17 起)及[*可逆容器* (ReversibleContainer) ](https://zh.cppreference.com/w/cpp/named_req/ReversibleContainer)的要求。
+
+### 模板参数
+
+**T** - 元素的类型。
+
+`T` 必须满足[*可复制赋值* (CopyAssignable) ](https://zh.cppreference.com/w/cpp/named_req/CopyAssignable)和[*可复制构造* (CopyConstructible) ](https://zh.cppreference.com/w/cpp/named_req/CopyConstructible)的要求。 (C++11 前)  
+加诸元素的要求依赖于容器上进行的实际操作。泛言之，要求元素类型是完整类型并满足[*可擦除* (Erasable) ](https://zh.cppreference.com/w/cpp/named_req/Erasable)的要求，但许多成员函数附带了更严格的要求。 (C++11 起) (C++17 前)  
+加诸元素的要求依赖于容器上进行的实际操作。泛言之，要求元素类型满足[*可擦除* (Erasable) ](https://zh.cppreference.com/w/cpp/named_req/Erasable)的要求，但许多成员函数附带了更严格的要求。若分配器满足[分配器完整性要求](https://zh.cppreference.com/w/cpp/named_req/Allocator#.E5.88.86.E9.85.8D.E5.99.A8.E5.AE.8C.E6.95.B4.E6.80.A7.E8.A6.81.E6.B1.82)，则容器（但非其成员）能以不完整元素类型实例化。 (C++17 起)  
+
+**Allocator** - 用于获取/释放内存及构造/析构内存中元素的分配器。类型必须满足[*分配器* (Allocator) ](https://zh.cppreference.com/w/cpp/named_req/Allocator)的要求。若 Allocator::value_type 与 T 不同则行为未定义。 |
+
+### 特化
+
+标准库提供 `std::vector` 对类型 bool 的特化，它可能为空间效率优化。
+
+[vector<bool>](https://zh.cppreference.com/w/cpp/container/vector_bool "cpp/container/vector bool")    节省空间的动态 bitset (类模板)
+
+### 成员类型
+
+| 成员类型 | 定义 |
+| :- | :- |
+| `value_type` | `T` |
+| `allocator_type` | `Allocator` |
+| `size_type` | 无符号整数类型（通常是 [std::size_t](https://zh.cppreference.com/w/cpp/types/size_t) ） |
+| `difference_type` | 有符号整数类型（通常是 [std::ptrdiff_t](https://zh.cppreference.com/w/cpp/types/ptrdiff_t) ） |
+| `reference` | `Allocator::reference` (C++11 前) |
+| `reference` | `value_type&` (C++11 起) |
+| `const_reference` | `Allocator::const_reference` (C++11 前) |
+| `const_reference` | `const value_type&` (C++11 起) |
+| `pointer` | `Allocator::pointer` (C++11 前) |
+| `pointer` | `std::allocator_traits<Allocator>::pointer` (C++11 起) |
+| `const_pointer` | `Allocator::const_pointer` (C++11 前) |
+| `const_pointer` | `std::allocator_traits<Allocator>::const_pointer` (C++11 起) |
+| `iterator` | [*遗留随机访问迭代器* (LegacyRandomAccessIterator)](https://zh.cppreference.com/w/cpp/named_req/RandomAccessIterator) |
+| `const_iterator` | 常随机访问迭代器 |
+| `reverse_iterator` | `std::reverse_iterator<iterator>` |
+| `const_reverse_iterator` | `std::reverse_iterator<const_iterator>` |
+
+### 成员函数
+
+| 成员函数 | 作用 |
+| :- | :- |
+| [(构造函数)](https://zh.cppreference.com/w/cpp/container/vector/vector) | 构造 `vector`
+(公开成员函数) |
+| [(析构函数)](https://zh.cppreference.com/w/cpp/container/vector/~vector) | 析构 `vector`
+(公开成员函数) |
+| [operator=](https://zh.cppreference.com/w/cpp/container/vector/operator%3D) | 赋值给容器
+(公开成员函数) |
+| [assign](https://zh.cppreference.com/w/cpp/container/vector/assign) | 将值赋给容器
+(公开成员函数) |
+| [get_allocator](https://zh.cppreference.com/w/cpp/container/vector/get_allocator) | 返回相关的分配器 (公开成员函数) |
+
+##### 元素访问
+
+| 元素访问 | 作用 |
+| :- | :- |
+| [at](https://zh.cppreference.com/w/cpp/container/vector/at) | 访问指定的元素，同时进行越界检查
+(公开成员函数) |
+| [operator[]](https://zh.cppreference.com/w/cpp/container/vector/operator_at) | 访问指定的元素
+(公开成员函数) |
+| [front](https://zh.cppreference.com/w/cpp/container/vector/front) | 访问第一个元素
+(公开成员函数) |
+| [back](https://zh.cppreference.com/w/cpp/container/vector/back) | 访问最后一个元素
+(公开成员函数) |
+| [data](https://zh.cppreference.com/w/cpp/container/vector/data) | 返回指向内存中数组第一个元素的指针(公开成员函数) |
+
+##### 迭代器
+
+| 迭代器 | 作用 |
+| :- | :- |
+| [begin / cbegin](https://zh.cppreference.com/w/cpp/container/vector/begin) | 返回指向容器第一个元素的迭代器 (公开成员函数) |
+| [end / cend](https://zh.cppreference.com/w/cpp/container/vector/end) | 返回指向容器尾端的迭代器 (公开成员函数) |
+| [rbegin / crbegin](https://zh.cppreference.com/w/cpp/container/vector/rbegin) | 返回指向容器最后元素的逆向迭代器 (公开成员函数) |
+| [rend / crend](https://zh.cppreference.com/w/cpp/container/vector/rend) | 返回指向前端的逆向迭代器 (公开成员函数) |
+
+##### 容量
+
+| 容量 | 作用 |
+| :- | :- |
+| [empty](https://zh.cppreference.com/w/cpp/container/vector/empty) | 检查容器是否为空 (公开成员函数) |
+| [size](https://zh.cppreference.com/w/cpp/container/vector/size) | 返回容纳的元素数 (公开成员函数) |
+| [max_size](https://zh.cppreference.com/w/cpp/container/vector/max_size) | 返回可容纳的最大元素数 (公开成员函数) |
+| [reserve](https://zh.cppreference.com/w/cpp/container/vector/reserve) | 预留存储空间 (公开成员函数) |
+| [capacity](https://zh.cppreference.com/w/cpp/container/vector/capacity) | 返回当前存储空间能够容纳的元素数 (公开成员函数) |
+| [shrink_to_fit](https://zh.cppreference.com/w/cpp/container/vector/shrink_to_fit)(C++11) | 通过释放未使用的内存减少内存的使用 (公开成员函数) |
+
+##### 修改器
+
+| 修改器 | 作用 |
+| :- | :- |
+| [clear](https://zh.cppreference.com/w/cpp/container/vector/clear) | 清除内容 (公开成员函数) |
+| [insert](https://zh.cppreference.com/w/cpp/container/vector/insert) | 插入元素 (公开成员函数) |
+| [emplace](https://zh.cppreference.com/w/cpp/container/vector/emplace)(C++11) | 原位构造元素 (公开成员函数) |
+| [erase](https://zh.cppreference.com/w/cpp/container/vector/erase) | 擦除元素 (公开成员函数) |
+| [push_back](https://zh.cppreference.com/w/cpp/container/vector/push_back) | 将元素添加到容器末尾 (公开成员函数) |
+| [emplace_back](https://zh.cppreference.com/w/cpp/container/vector/emplace_back)(C++11) | 在容器末尾就地构造元素 (公开成员函数) |
+| [pop_back](https://zh.cppreference.com/w/cpp/container/vector/pop_back) | 移除末元素 (公开成员函数) |
+| [resize](https://zh.cppreference.com/w/cpp/container/vector/resize) | 改变容器中可存储元素的个数 (公开成员函数) |
+| [swap](https://zh.cppreference.com/w/cpp/container/vector/swap) | 交换内容 (公开成员函数) |
+
 # vector
 
 vector 是顺序容器的一种。vector 是可变长的动态数组，支持随机访问迭代器，所有STL算法都能对 vector 进行操作。要使用 vector，需要包含头文件`#include <vector>`。
