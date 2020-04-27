@@ -63,3 +63,73 @@ public:
     }
 };
 ```
+
+方法2: 利用hashmap优化
+
+判断是否出现过时, 利用hashmap优化时间
+
+该方法的时间复杂度O(n), 空间复杂度O(n)
+
+```c++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        //s[start,end) 前面包含 后面不包含
+        int start(0), end(0), length(0), result(0);
+        int sSize = int(s.size());
+        unordered_map<char, int> hash;
+        while (end < sSize)
+        {
+            char tmpChar = s[end];
+            //仅当s[start,end) 中存在s[end]时更新start
+            if (hash.find(tmpChar) != hash.end() && hash[tmpChar] >= start)
+            {
+                start = hash[tmpChar] + 1;
+                length = end - start;
+            }
+            hash[tmpChar] = end;
+
+            end++;
+            length++;
+            result = result > length ? result : length;
+        }
+        return result;
+    }
+};
+```
+
+方法3: 利用数组(桶)代替hashmap
+
+判断是否出现过时, 利用桶来代替hashmap以优化时间.  
+int[26]用于字母'a'-'z'或者'A'-'Z';  
+int[128]用于ASCII码;  
+int[256]用于扩展ASCII码.  
+该方法的时间复杂度O(n), 空间复杂度O(n).
+
+```c++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        //s[start,end) 前面包含 后面不包含
+        int start(0), end(0), length(0), result(0);
+        int sSize = int(s.size());
+        vector<int> vec(128, -1);
+        while (end < sSize)
+        {
+            char tmpChar = s[end];
+            //仅当s[start,end) 中存在s[end]时更新start
+            if (vec[int(tmpChar)] >= start)
+            {
+                start = vec[int(tmpChar)] + 1;
+                length = end - start;
+            }
+            vec[int(tmpChar)] = end;
+
+            end++;
+            length++;
+            result = result > length ? result : length;
+        }
+        return result;
+    }
+};
+```
