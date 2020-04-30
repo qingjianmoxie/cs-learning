@@ -13,6 +13,8 @@
 ## 双指针
 
 * [3_无重复字符的最长子串](./3_longest-substring-without-repeating-characters.md)
+* [11_盛最多水的容器](./11_container-with-most-water.md)
+* [15_三数之和](./15_3sum.md)
 * [61_删除链表的倒数第N个节点](./61_rotate-list.md)
 * [206_反转链表](./206_reverse-linked-list.md)
 
