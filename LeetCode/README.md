@@ -21,6 +21,8 @@
 ## 数组
 * [53_最大子序和](./53_maximum-subarray.md)
 
+## 栈
+* [20_有效的括号](./20_valid-parentheses.md)
 
 ## 反思录
 * [算法面试](./算法面试.md)
