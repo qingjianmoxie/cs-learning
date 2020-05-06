@@ -23,6 +23,7 @@
 
 ## 栈
 * [20_有效的括号](./20_valid-parentheses.md)
+* [71_简化路径](./71_simplify-path.md)
 * [155_最小栈](./155_min-stack.md)
 
 ## 反思录
