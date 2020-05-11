@@ -5,6 +5,7 @@
 * [11_盛最多水的容器](./11_container-with-most-water.md)
 * [15_三数之和](./15_3sum.md)
 * [16_最接近的三数之和](./16_3sum-closest.md)
+* [18_四数之和](./18_4sum.md)
 
 ## 链表
 
@@ -30,6 +31,9 @@
 * [150_逆波兰表达式求值](./150_evaluate-reverse-polish-notation.md)
 * [155_最小栈](./155_min-stack.md)
 * [173_二叉搜索树迭代器](./173_binary-search-tree-iterator.md)
+
+## 多线程
+* [1114_按序打印](./1114_print-in-order.md)
 
 ## 反思录
 * [算法面试](./算法面试.md)
