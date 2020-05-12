@@ -1,4 +1,4 @@
-# LeetCode
+# LC
 
 ## 数组
 * [53_最大子序和](./53_maximum-subarray.md)
@@ -6,6 +6,8 @@
 * [15_三数之和](./15_3sum.md)
 * [16_最接近的三数之和](./16_3sum-closest.md)
 * [18_四数之和](./18_4sum.md)
+* [26_删除排序数组中的重复项(easy)](./26_remove-duplicates-from-sorted-array.md)
+* [27_移除元素(easy)](./27_remove-element.md)
 
 ## 链表
 
