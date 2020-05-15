@@ -39,6 +39,12 @@
 * [155_最小栈](./155_min-stack.md)
 * [173_二叉搜索树迭代器](./173_binary-search-tree-iterator.md)
 
+## depth-first search(DFS)
+* [98_验证二叉搜索树(medium)](./98_validate-binary-search-tree.md)
+
+## 回溯算法
+* [46_全排列(medium)](./46_permutations.md)
+
 ## 多线程
 * [1114_按序打印](./1114_print-in-order.md)
 
