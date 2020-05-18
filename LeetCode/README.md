@@ -44,6 +44,8 @@
 
 ## 回溯算法
 * [46_全排列(medium)](./46_permutations.md)
+* [47_全排列II(medium)](./47_permutations-ii.md)
+* [51_N皇后(hard)](./51_n-queens.md)
 
 ## 多线程
 * [1114_按序打印](./1114_print-in-order.md)
