@@ -3,7 +3,7 @@
 * [Introduction](README.md)
 * [c](c/README.md)
 * [cpp](cpp/README.md)
-* [数据结构](数据结构/README.md)
+* [DS & Algo](DS&Algo/README.md)
 * [distsysbook](distsysbook/README.md)
     * [0_index](distsysbook/0_index.md)
     * [1_intro](distsysbook/1_intro.md)
