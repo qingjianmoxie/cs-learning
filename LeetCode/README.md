@@ -41,6 +41,7 @@
 
 ## depth-first search(DFS)
 * [98_验证二叉搜索树(medium)](./98_validate-binary-search-tree.md)
+* [99_恢复二叉搜索树(hard)](./99_recover-binary-search-tree.md)
 * [105_从前序与中序遍历序列构造二叉树(medium)](./105_construct-binary-tree-from-preorder-and-inorder-traversal.md)
 * [124_二叉树中的最大路径和(hard)](./124_binary-tree-maximum-path-sum.md)
 
