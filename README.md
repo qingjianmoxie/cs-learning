@@ -28,8 +28,6 @@
     * [Perf -- Linux下的系统性能调优工具](Linux/perf.md)
 * [go](go/README.md)
 * [分布式数据库](分布式数据库/README.md)
-    * [高可用与高可靠](分布式数据库/高可用与高可靠.md)
-    * [技术博客](分布式数据库/技术博客.md)
 * [python](python/README.md)
 * [redis](redis/README.md)
 * [设计模式](设计模式/README.md)
