@@ -21,7 +21,7 @@
 * [21_合并两个有序链表](./21_merge-two-sorted-lists.md)
 * [24_两两交换链表中的节点](./24_swap-nodes-in-pairs.md)
 * [25_K个一组翻转链表](./25_reverse-nodes-in-k-group.md)
-* [61_删除链表的倒数第N个节点](./61_rotate-list.md)
+* [61_旋转链表](./61_rotate-list.md)
 * [206_反转链表](./206_reverse-linked-list.md)
 
 ## 双指针
