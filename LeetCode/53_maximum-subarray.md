@@ -17,7 +17,7 @@
 方法1: 动态规划
 
 dp[i]表示nums中以nums[i]结尾的最大子序和:
-dp[i] = max(db[i-1]+nums[i], nums[i]);
+dp[i] = max(dp[i-1]+nums[i], nums[i]);
 时间复杂度O(n), 空间复杂度O(n), 可优化至O(1).
 
 ```c++

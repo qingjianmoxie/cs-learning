@@ -1,7 +1,6 @@
 # LC
 
 ## 数组
-* [53_最大子序和](./53_maximum-subarray.md)
 * [11_盛最多水的容器](./11_container-with-most-water.md)
 * [15_三数之和](./15_3sum.md)
 * [16_最接近的三数之和](./16_3sum-closest.md)
@@ -13,6 +12,7 @@
 * [34_在排序数组中查找元素的第一个和最后一个位置(medium)](./34_find-first-and-last-position-of-element-in-sorted-array.md)
 * [35_搜索插入位置(easy)](./35_search-insert-position.md)
 * [39_组合总和(medium)](./39_combination-sum.md)
+* [53_最大子序和](./53_maximum-subarray.md)
 
 ## 链表
 
@@ -29,7 +29,7 @@
 * [3_无重复字符的最长子串](./3_longest-substring-without-repeating-characters.md)
 * [11_盛最多水的容器](./11_container-with-most-water.md)
 * [15_三数之和](./15_3sum.md)
-* [61_删除链表的倒数第N个节点](./61_rotate-list.md)
+* [61_旋转链表](./61_rotate-list.md)
 * [206_反转链表](./206_reverse-linked-list.md)
 
 ## 栈
