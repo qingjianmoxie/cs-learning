@@ -50,6 +50,9 @@
 * [47_全排列II(medium)](./47_permutations-ii.md)
 * [51_N皇后(hard)](./51_n-queens.md)
 
+## 动态规划
+* [70_爬楼梯(easy)](./70_climbing-stairs.md)
+
 ## 剑指
 * [46_把数字翻译成字符串(medium)](./46_把数字翻译成字符串.md)
 
