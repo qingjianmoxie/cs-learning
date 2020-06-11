@@ -25,11 +25,41 @@
 链接：https://leetcode-cn.com/problems/climbing-stairs
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
+## 题解
+
+动态规划
+
 ```c++
 class Solution {
 public:
     int climbStairs(int n) {
-        
+        int dp[n + 1];
+        dp[0] = 1;
+        dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n];
+    }
+};
+```
+
+使用滚动数组降低空间复杂度.
+
+```c++
+class Solution {
+public:
+    int climbStairs(int n) {
+        int p = 0;
+        int q = 0;
+        int r = 1;
+        for (int i = 1; i <= n; i++) {
+            p = q;
+            q = r;
+            r = 0;
+            r += p + q;
+        }
+        return r;
     }
 };
 ```
