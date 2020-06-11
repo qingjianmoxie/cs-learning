@@ -38,6 +38,7 @@
 * [150_逆波兰表达式求值](./150_evaluate-reverse-polish-notation.md)
 * [155_最小栈](./155_min-stack.md)
 * [173_二叉搜索树迭代器](./173_binary-search-tree-iterator.md)
+* [739_每日温度(medium)](./739_daily-temperatures.md)
 
 ## depth-first search(DFS)
 * [98_验证二叉搜索树(medium)](./98_validate-binary-search-tree.md)
