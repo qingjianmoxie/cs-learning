@@ -51,6 +51,9 @@
 * [47_全排列II(medium)](./47_permutations-ii.md)
 * [51_N皇后(hard)](./51_n-queens.md)
 
+# 树
+* [297_二叉树的序列化与反序列化(hard)](./297_serialize-and-deserialize-binary-tree.md)
+
 ## 动态规划
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
 
