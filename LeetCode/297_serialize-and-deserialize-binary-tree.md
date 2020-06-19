@@ -200,3 +200,5 @@ class Codec {
     }
 };
 ```
+
+此题与 [1028_从先序遍历还原二叉树(hard)](./1028_recover-a-tree-from-preorder-traversal.md) 有异曲同工之妙.

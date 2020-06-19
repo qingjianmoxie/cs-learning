@@ -30,6 +30,7 @@
 * [11_盛最多水的容器](./11_container-with-most-water.md)
 * [15_三数之和](./15_3sum.md)
 * [61_旋转链表](./61_rotate-list.md)
+* [125_验证回文串(easy)](./125_valid-palindrome.md)
 * [206_反转链表](./206_reverse-linked-list.md)
 
 ## 栈
@@ -53,6 +54,7 @@
 
 # 树
 * [297_二叉树的序列化与反序列化(hard)](./297_serialize-and-deserialize-binary-tree.md)
+* [1028_从先序遍历还原二叉树(hard)](./1028_recover-a-tree-from-preorder-traversal.md)
 
 ## 动态规划
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
