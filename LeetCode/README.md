@@ -57,10 +57,14 @@
 * [1028_从先序遍历还原二叉树(hard)](./1028_recover-a-tree-from-preorder-traversal.md)
 
 ## 动态规划
+* [10_正则表达式匹配(hard)](./10_regular-expression-matching.md)
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
 
 ## 剑指
 * [46_把数字翻译成字符串(medium)](./46_把数字翻译成字符串.md)
+
+## 程序员面试金典
+* [16.18_模式匹配(medium)](./16.18_pattern-matching-lcci.md)
 
 ## 多线程
 * [1114_按序打印](./1114_print-in-order.md)
