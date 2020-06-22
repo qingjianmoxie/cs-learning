@@ -1,7 +1,10 @@
 # python
 
+[python2.7文档](https://docs.python.org/zh-cn/2.7/)
+
 * [list和tuple](./list和tuple.md)
 * [逐行读取数据](./逐行读取数据.md)
+* [encode()和decode()](./encode()和decode().md)
 * [字符串处理](./字符串处理.md)
 * [类和对象](./类和对象.md)
     * [类和实例](./类和实例.md)
