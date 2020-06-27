@@ -51,6 +51,7 @@
 * [46_全排列(medium)](./46_permutations.md)
 * [47_全排列II(medium)](./47_permutations-ii.md)
 * [51_N皇后(hard)](./51_n-queens.md)
+* [139_单词拆分(medium)](./139_word-break.md)
 
 # 树
 * [297_二叉树的序列化与反序列化(hard)](./297_serialize-and-deserialize-binary-tree.md)
