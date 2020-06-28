@@ -3,6 +3,7 @@ import sys
 import os
 import re
 import codecs
+import difflib
 import mysql.connector
 import server_info_config
 import sql_type_filter
@@ -299,17 +300,32 @@ class SqlExecOpr:
         :return: True - 一致 False - 不一致
         '''
         try:
+            linenum = 0
             self.OpenFile(normal_file)
             with open(prepare_file,'r') as pf:
+                # for linenum, normal_line in enumerate(self.file):
                 for normal_line in self.lines:
+                    linenum += 1
                     prepare_line = pf.readline()
                     if prepare_line:
-                        prepare_line = prepare_line.strip()
+                        prepare_line = prepare_line.strip() + '\n'
                         # 将unicode编码的字符串转换成utf-8编码
-                        normal_line = normal_line.encode('utf-8').strip()
+                        normal_line = normal_line.encode('utf-8').strip() + '\n'
                         if prepare_line != normal_line:
-                            print("%s [ fail ]" % prepare_file)
+                            print("{:<}\t{:>}".format(prepare_file, "[ fail ]"))
+                            print("line num : %s" % linenum)
+                            diff = difflib.ndiff(normal_line.splitlines(1), prepare_line.splitlines(1))
+                            # 这是什么意思?
+                            print ''.join(diff),
                             return False
+                    # prepare缺行
+                    else:
+                        print("{:<}\t{:>}".format(prepare_file, "[ fail ]"))
+                        print("line num : %s" % linenum)
+                        diff = difflib.ndiff(normal_line.splitlines(1), prepare_line.splitlines(1))
+                        # 这是什么意思?
+                        print ''.join(diff),
+                        return False
             self.CloseFile(normal_file)
         except IOError as e:
             msg = e
@@ -324,7 +340,7 @@ class SqlExecOpr:
             print_log.write(msg)
             return False
         os.remove(prepare_file)
-        print("%s [ pass ]" % prepare_file)
+        print("{:<}\t{:>}".format(prepare_file, "[ pass ]"))
         return True
 
 

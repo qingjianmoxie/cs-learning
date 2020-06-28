@@ -24,6 +24,16 @@ class LogPrinter:
         打开日志文件
         :return: True 成功 False 失败
         '''
+        import os
+        # 判断路径是否存在
+        dirname = os.path.dirname(self.log_path)
+        # 如果是当前文件夹, dirname为'', mkdirs会报错
+        if dirname:
+            isExists=os.path.exists(dirname)
+            # 判断结果
+            if not isExists:
+                # 如果不存在则创建目录
+                os.makedirs(dirname)
         try:
             self.f = open(self.log_path, 'w')
             return True
