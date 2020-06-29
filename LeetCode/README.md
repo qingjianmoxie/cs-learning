@@ -58,6 +58,7 @@
 * [1028_从先序遍历还原二叉树(hard)](./1028_recover-a-tree-from-preorder-traversal.md)
 
 ## 动态规划
+* [5_最长回文子串(medium)](./5_longest-palindromic-substring.md)
 * [10_正则表达式匹配(hard)](./10_regular-expression-matching.md)
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
 
