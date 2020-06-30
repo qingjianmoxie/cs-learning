@@ -13,6 +13,7 @@
 * [35_搜索插入位置(easy)](./35_search-insert-position.md)
 * [39_组合总和(medium)](./39_combination-sum.md)
 * [53_最大子序和](./53_maximum-subarray.md)
+* [509_斐波那契数(easy)](./509_fibonacci-number.md)
 
 ## 链表
 
@@ -63,6 +64,7 @@
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
 
 ## 剑指
+* [09_用两个栈实现队列(easy)](./09_用两个栈实现队列.md)
 * [46_把数字翻译成字符串(medium)](./46_把数字翻译成字符串.md)
 
 ## 程序员面试金典
