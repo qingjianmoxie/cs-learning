@@ -14,6 +14,7 @@
 * [39_组合总和(medium)](./39_combination-sum.md)
 * [53_最大子序和](./53_maximum-subarray.md)
 * [509_斐波那契数(easy)](./509_fibonacci-number.md)
+* [718_最长重复子数组(medium)](./718_maximum-length-of-repeated-subarray.md)
 
 ## 链表
 
