@@ -21,6 +21,7 @@
 * [2_两数相加](./2_add-two-numbers.md)
 * [19_删除链表的倒数第N个节点](./19_remove-nth-node-from-end-of-list.md)
 * [21_合并两个有序链表](./21_merge-two-sorted-lists.md)
+* [23_合并K个排序链表(hard)](./23_merge-k-sorted-lists.md)
 * [24_两两交换链表中的节点](./24_swap-nodes-in-pairs.md)
 * [25_K个一组翻转链表](./25_reverse-nodes-in-k-group.md)
 * [61_旋转链表](./61_rotate-list.md)
@@ -43,6 +44,9 @@
 * [173_二叉搜索树迭代器](./173_binary-search-tree-iterator.md)
 * [739_每日温度(medium)](./739_daily-temperatures.md)
 
+## 堆
+* [378_有序矩阵中第K小的元素(medium)](./378_kth-smallest-element-in-a-sorted-matrix.md)
+
 ## depth-first search(DFS)
 * [98_验证二叉搜索树(medium)](./98_validate-binary-search-tree.md)
 * [99_恢复二叉搜索树(hard)](./99_recover-binary-search-tree.md)
@@ -63,6 +67,7 @@
 * [5_最长回文子串(medium)](./5_longest-palindromic-substring.md)
 * [10_正则表达式匹配(hard)](./10_regular-expression-matching.md)
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
+* [300_最长上升子序列(medium)](./300_longest-increasing-subsequence.md)**详解**
 
 ## 剑指
 * [09_用两个栈实现队列(easy)](./09_用两个栈实现队列.md)
