@@ -199,7 +199,7 @@ SELECT JSON_UNQUOTE("\"123\""); -- 123
 
 ## 五 返回json值属性的函数
 
-1.JSON_DEPTH 深度
+1. JSON_DEPTH 深度
 ```sql
 -- JSON_DEPTH(json_doc)
 -- 获取json文档的深度。如果参数为NULL，则返回NULL。
@@ -209,7 +209,7 @@ SELECT JSON_DEPTH('[10, 20]'), JSON_DEPTH('[[], {}]'); -- 2 2
 SELECT JSON_DEPTH('[10, {"a": 20}]'); -- 3
 ```
 
-2.JSON_LENGTH 长度
+2. JSON_LENGTH 长度
 ```sql
 -- JSON_LENGTH(json_doc[, path])
 -- 获取指定路径下的长度。如果参数为NULL，则返回NULL。　
@@ -222,19 +222,31 @@ SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}'); -- 2
 SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}', '$.b'); -- 1
 ```
 
-3.JSON_TYPE 类型
+3. JSON_TYPE 类型
 ```sql
 -- JSON_TYPE(json_val)
 -- 获取json文档的具体类型。如果参数为NULL，则返回NULL。
 select JSON_TYPE('[1,2]'); -- ARRAY
 ```
 
-4.JSON_VALID 是否有效json格式
+4. JSON_VALID 是否有效json格式
 ```sql
 -- JSON_VALID(val)
 -- 判断val是否为有效的json格式，是为1，不是为0。如果参数为NUL，则返回NULL。
 SELECT JSON_VALID('{"a": 1}'); -- 1
 SELECT JSON_VALID('hello'), JSON_VALID('"hello"'); -- 1
+```
+
+5. JSON_STORAGE_SIZE(json_val) 返回json_val存储字符数
+```sql
+select JSON_STORAGE_SIZE('["a",1,{"key1":"value1"},"5","77",{"key2":["value3","valueX","valueY"]},"j","2"]');
+
+select JSON_STORAGE_SIZE('"a "') 计算空格 标点 占字符数
+```
+
+6. JSON_PRETTY(json_val) 格式化显示json文档
+```sql
+select json_pretty('["a",1,{"key1":"value1"},"5","77",{"key2":["value3","valueX","valueY"]},"j","2"]');
 ```
 
 附录:
