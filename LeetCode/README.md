@@ -38,6 +38,7 @@
 
 ## 栈
 * [20_有效的括号](./20_valid-parentheses.md)
+* [32_最长有效括号(hard)](./32_longest-valid-parentheses.md)
 * [71_简化路径](./71_simplify-path.md)
 * [150_逆波兰表达式求值](./150_evaluate-reverse-polish-notation.md)
 * [155_最小栈](./155_min-stack.md)
