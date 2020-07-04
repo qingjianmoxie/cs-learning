@@ -31,7 +31,8 @@
 class Solution {
 public:
     TreeNode* sortedArrayToBST(vector<int>& nums) {
-        if (nums.empty()) return NULL;
+        // helper中有判断, 此处不需要判断
+        // if (nums.empty()) return NULL;
         int size = nums.size();
         int left = 0;
         int right = size - 1;
@@ -40,14 +41,21 @@ public:
 
     TreeNode* helper(const vector<int>& nums, int left, int right) {
         if (left > right) return NULL;
+        // 总是选择中间位置左边的数字作为根节点
         int mid = (left + right) >> 1;
         TreeNode* root = new TreeNode(nums[mid]);
-        if (left == right) {
-            return root;
-        }
+        // if (left == right) {
+        //     return root;
+        // }
         root->left = helper(nums, left, mid - 1);
         root->right = helper(nums, mid + 1, right);
         return root;
     }
 };
 ```
+
+复杂度分析
+
++ 时间复杂度：O(n)，其中 n 是数组的长度。每个数字只访问一次。
+
++ 空间复杂度：O(logn)，其中 n 是数组的长度。空间复杂度不考虑返回值，因此空间复杂度主要取决于递归栈的深度，递归栈的深度是 O(logn)。
