@@ -58,6 +58,7 @@
 * [46_全排列(medium)](./46_permutations.md)
 * [47_全排列II(medium)](./47_permutations-ii.md)
 * [51_N皇后(hard)](./51_n-queens.md)
+* [63_不同路径II(hard)](./63_unique-paths-ii.md)
 * [139_单词拆分(medium)](./139_word-break.md)
 
 # 树
@@ -68,6 +69,7 @@
 ## 动态规划
 * [5_最长回文子串(medium)](./5_longest-palindromic-substring.md)
 * [10_正则表达式匹配(hard)](./10_regular-expression-matching.md)
+* [44_通配符匹配(hard)](./44_wildcard-matching.md)
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
 * [300_最长上升子序列(medium)](./300_longest-increasing-subsequence.md)**详解**
 
