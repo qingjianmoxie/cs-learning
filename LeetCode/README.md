@@ -52,6 +52,7 @@
 * [98_验证二叉搜索树(medium)](./98_validate-binary-search-tree.md)
 * [99_恢复二叉搜索树(hard)](./99_recover-binary-search-tree.md)
 * [105_从前序与中序遍历序列构造二叉树(medium)](./105_construct-binary-tree-from-preorder-and-inorder-traversal.md)
+* [112_路径总和(easy)](./112_path-sum.md)
 * [124_二叉树中的最大路径和(hard)](./124_binary-tree-maximum-path-sum.md)
 
 ## 回溯算法
@@ -78,6 +79,7 @@
 * [46_把数字翻译成字符串(medium)](./46_把数字翻译成字符串.md)
 
 ## 程序员面试金典
+* [16.11_跳水板(easy)](./16.11_diving-board-lcci.md)
 * [16.18_模式匹配(medium)](./16.18_pattern-matching-lcci.md)
 
 ## 多线程
