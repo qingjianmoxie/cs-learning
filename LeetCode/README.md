@@ -81,6 +81,7 @@
 ## 程序员面试金典
 * [16.11_跳水板(easy)](./16.11_diving-board-lcci.md)
 * [16.18_模式匹配(medium)](./16.18_pattern-matching-lcci.md)
+* [17.13_恢复空格(medium)](./17.13_re-space-lcci.md)
 
 ## 多线程
 * [1114_按序打印](./1114_print-in-order.md)
