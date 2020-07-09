@@ -1,11 +1,12 @@
 # _*_ coding:utf-8 _*_
 import re
 
-insert_pattern = re.compile(r"^\s*insert.*", re.I | re.S)
-update_pattern = re.compile(r"^\s*update.*", re.I | re.S)
-delete_pattern = re.compile(r"^\s*delete.*", re.I | re.S)
-select_pattern = re.compile(r"^\s*select.*", re.I | re.S)
-show_pattern   = re.compile(r"^\s*show.*", re.I | re.S)
+insert_pattern  = re.compile(r"^\s*insert.*", re.I | re.S)
+update_pattern  = re.compile(r"^\s*update.*", re.I | re.S)
+delete_pattern  = re.compile(r"^\s*delete.*", re.I | re.S)
+select_pattern  = re.compile(r"^\s*select.*", re.I | re.S)
+show_pattern    = re.compile(r"^\s*show.*", re.I | re.S)
+explain_pattern = re.compile(r"^\s*explain.*", re.I | re.S)
 
 def is_need_prepare(sql):
     if insert_pattern.match(sql):
@@ -29,6 +30,8 @@ def check_sql_has_record(sql):
     if select_pattern.match(sql):
         return True
     elif show_pattern.match(sql):
+        return True
+    elif explain_pattern.match(sql):
         return True
     else:
         return False

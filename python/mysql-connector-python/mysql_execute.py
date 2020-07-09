@@ -28,6 +28,7 @@ garbage_pattern     = re.compile(r"^\s*#.*")
 replace_pattern     = re.compile(r"^\s*--replace.*")
 # 以--error 开头
 error_pattern       = re.compile(r"^\s*--error\s*(\d+)\s*$")
+error2_pattern      = re.compile(r"^\s*--ERROR\s*(\d+)\s*$")
 # delimiter ; 转 //
 delimiter_pattern_1 = re.compile(r"^\s*delimiter\s+(.+?)\s*;\s*$")
 # delimiter // 转 ;
@@ -208,6 +209,7 @@ class SqlExecOpr:
                 re_replace     = replace_pattern.match(line)
                 # 匹配以--error 开头
                 re_error       = error_pattern.match(line)
+                re_error2      = error2_pattern.match(line)
                 # 匹配delimiter ; 转 //
                 re_delimiter_1 = delimiter_pattern_1.match(line)
                 # 匹配delimiter // 转 ;
@@ -224,7 +226,7 @@ class SqlExecOpr:
                     delimiter = re_delimiter_1.group(1).strip()
                 elif ";" != delimiter and re_delimiter_2:
                     delimiter = ";"
-                elif re_error:
+                elif re_error or re_error2:
                     errno = int(re_error.group(1).strip())
                 # sql语句
                 else:
@@ -300,6 +302,7 @@ class SqlExecOpr:
         :return: True - 一致 False - 不一致
         '''
         try:
+            ret = True
             linenum = 0
             self.OpenFile(normal_file)
             with open(prepare_file,'r') as pf:
@@ -312,21 +315,19 @@ class SqlExecOpr:
                         # 将unicode编码的字符串转换成utf-8编码
                         normal_line = normal_line.encode('utf-8').strip() + '\n'
                         if prepare_line != normal_line:
-                            print("{:<}\t{:>}".format(prepare_file, "[ fail ]"))
                             print("line num : %s" % linenum)
                             diff = difflib.ndiff(normal_line.splitlines(1), prepare_line.splitlines(1))
                             # 这是什么意思?
                             print ''.join(diff),
-                            return False
+                            ret = False
                     # prepare缺行
                     else:
-                        print("{:<}\t{:>}".format(prepare_file, "[ fail ]"))
                         print("line num : %s" % linenum)
                         diff = difflib.ndiff(normal_line.splitlines(1), prepare_line.splitlines(1))
                         # 这是什么意思?
                         print ''.join(diff),
-                        return False
-            self.CloseFile(normal_file)
+                        ret = False
+                        break
         except IOError as e:
             msg = e
             msg = '{:<}'.format(msg)
@@ -339,9 +340,14 @@ class SqlExecOpr:
             print (msg)
             print_log.write(msg)
             return False
-        os.remove(prepare_file)
-        print("{:<}\t{:>}".format(prepare_file, "[ pass ]"))
-        return True
+        self.CloseFile(normal_file)
+        if ret:
+            os.remove(prepare_file)
+            print("{:<}\t{:>}".format(prepare_file, "[ pass ]"))
+            return True
+        else:
+            print("{:<}\t{:>}".format(prepare_file, "[ fail ]"))
+            return False
 
 
     def OpenFile(self, file_path):
