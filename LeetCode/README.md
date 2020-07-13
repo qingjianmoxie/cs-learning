@@ -13,6 +13,7 @@
 * [35_搜索插入位置(easy)](./35_search-insert-position.md)
 * [39_组合总和(medium)](./39_combination-sum.md)
 * [53_最大子序和](./53_maximum-subarray.md)
+* [350_两个数组的交集II(easy)](./350_intersection-of-two-arrays-ii.md)
 * [509_斐波那契数(easy)](./509_fibonacci-number.md)
 * [718_最长重复子数组(medium)](./718_maximum-length-of-repeated-subarray.md)
 
