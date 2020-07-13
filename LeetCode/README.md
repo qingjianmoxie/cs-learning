@@ -72,6 +72,7 @@
 * [10_正则表达式匹配(hard)](./10_regular-expression-matching.md)
 * [44_通配符匹配(hard)](./44_wildcard-matching.md)
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
+* [72_编辑距离(hard)](./72_edit-distance.md)**详解**
 * [300_最长上升子序列(medium)](./300_longest-increasing-subsequence.md)**详解**
 * [309_最佳买卖股票时机含冷冻期(medium)](./309_best-time-to-buy-and-sell-stock-with-cooldown.md)
 
