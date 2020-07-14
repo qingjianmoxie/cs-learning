@@ -54,6 +54,7 @@
 * [99_恢复二叉搜索树(hard)](./99_recover-binary-search-tree.md)
 * [105_从前序与中序遍历序列构造二叉树(medium)](./105_construct-binary-tree-from-preorder-and-inorder-traversal.md)
 * [112_路径总和(easy)](./112_path-sum.md)
+* [120_三角形最小路径和(medium)](./120_triangle.md)
 * [124_二叉树中的最大路径和(hard)](./124_binary-tree-maximum-path-sum.md)
 
 ## 回溯算法
