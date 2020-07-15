@@ -16,4 +16,5 @@
 # Oracle
 
 * [TO_CHAR(datetime)](./TO_CHAR(datetime).md)
+* [TO_CHAR(number)](./TO_CHAR(number).md)
 * [LISTAGG](./LISTAGG.md)
