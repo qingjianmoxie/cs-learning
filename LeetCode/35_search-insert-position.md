@@ -26,6 +26,31 @@
 链接：https://leetcode-cn.com/problems/search-insert-position
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
+## 题解
+
+第一种, 暴力解法, 从前往后遍历
+
+```c++
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int size = nums.size();
+        if (0 == size) return 0;
+        for (int i = 0; i < size; i++) {
+            if (nums[i] >= target) {
+                return i;
+            }
+        }
+        return size;
+    }
+};
+```
+
+时间复杂度O(N), 空间复杂度O(1)
+
+
+第二种, 二分法
+
 ```c++
 class Solution {
 public:
@@ -33,6 +58,7 @@ public:
         int left = 0;
         int right = nums.size() - 1;
         int mid = 0;
+        // 注意是<=, 想想为什么
         while (left <= right) {
             mid = (left + right) >> 1;
             if (nums[mid] > target) {
@@ -46,3 +72,5 @@ public:
     }
 };
 ```
+
+时间复杂度O(logN), 空间复杂度O(1)
