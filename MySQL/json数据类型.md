@@ -61,7 +61,7 @@ SELECT JSON_OBJECT('age', 20, 'time', now());
 ```sql
 -- JSON_QUOTE(json_val)
 -- 将json_val用"号括起来。
-SELECT JSON_QUOTE('[1,2,3]'); -- "[1,2,3]" 
+SELECT JSON_QUOTE('[1,2,3]'); -- "[1,2,3]"
 ```
 
 ## 三 搜索json值函数
@@ -127,7 +127,7 @@ SELECT JSON_SEARCH(@j3, 'all', '%b%', NULL, '$[2]'); -- "$[2].x"
 SET @j4 = '["a", ["b", "c"], "d"]';
 -- SELECT JSON_ARRAY_APPEND(@j4, '$[1][0]', 3); -- ["a", [["b", 3], "c"], "d"]
 SET @j5 = '{"a": 1, "b": [2, 3], "c": 4}';
-SELECT JSON_ARRAY_APPEND(@j5, '$.b', 'x'); -- {"a": 1, "b": [2, 3, "x"], "c": 4} 
+SELECT JSON_ARRAY_APPEND(@j5, '$.b', 'x'); -- {"a": 1, "b": [2, 3, "x"], "c": 4}
 SELECT JSON_ARRAY_APPEND(@j5, '$.c', 'y'); -- {"a": 1, "b": [2, 3], "c": [4, "y"]}
 SELECT JSON_ARRAY_APPEND(@j5, '$', 'z'); -- [{"a": 1, "b": [2, 3], "c": 4}, "z"]
 ```
@@ -251,29 +251,29 @@ select json_pretty('["a",1,{"key1":"value1"},"5","77",{"key2":["value3","valueX"
 
 附录:
 
-| 函数名 | 描述 |
-| :- | :- |
-| JSON_APPEND()(废弃的5.7.9)  | JSON文件追加数据                              |
-| JSON_ARRAY()                | 创建JSON数组                                 |
-| JSON_ARRAY_APPEND()         | 指定位置追加数组元素                          |
-| JSON_ARRAY_INSERT()         | 指定位置插入数组元素                          |
-| ->                          | 相当于json_extract()                         |
-| JSON_CONTAINS()             | 指定数据是否存在                              |
-| JSON_CONTAINS_PATH()        | 指定路径是否存在                              |
-| JSON_DEPTH()                | 深度                                         |
-| JSON_EXTRACT()              | 查找所有指定数据                              |
-| JSON_INSERT()               | 指定位置插入                                  |
-| JSON_KEYS()                 | 查找所有指定键值                              |
-| JSON_LENGTH()               | 元素数                                       |
-| JSON_MERGE()(废弃的5.7.22)  | 合并，保存重复键。JSON_MERGE_PRESERVE()的同义词 |
-| JSON_MERGE_PATCH()          | 合并，免去重复键的值                           |
-| JSON_MERGE_PRESERVE()       | 合并，保存重复键                              |
-| JSON_OBJECT()               | 创建JSON对象                                 |
-| JSON_QUOTE()                | 加"号                                        |
-| JSON_REMOVE()               | 指定位置移除                                  |
-| JSON_REPLACE()              | 指定位置替换                                  |
-| JSON_SEARCH()               | 查找所有指定值的位置                           |
-| JSON_SET()                  | 指定位置设置                                  |
-| JSON_TYPE()                 | JSON值类型                                    |
-| JSON_UNQUOTE()              | 去"号                                        |
-| JSON_VALID()                | 是否有效json格式                              |
+函数名 | 描述
+:- | :-
+JSON_APPEND()(废弃的5.7.9)  | JSON文件追加数据
+JSON_ARRAY()                | 创建JSON数组
+JSON_ARRAY_APPEND()         | 指定位置追加数组元素
+JSON_ARRAY_INSERT()         | 指定位置插入数组元素
+->                          | 相当于json_extract()
+JSON_CONTAINS()             | 指定数据是否存在
+JSON_CONTAINS_PATH()        | 指定路径是否存在
+JSON_DEPTH()                | 深度
+JSON_EXTRACT()              | 查找所有指定数据
+JSON_INSERT()               | 指定位置插入
+JSON_KEYS()                 | 查找所有指定键值
+JSON_LENGTH()               | 元素数
+JSON_MERGE()(废弃的5.7.22)  | 合并，保存重复键。JSON_MERGE_PRESERVE()的同义词
+JSON_MERGE_PATCH()          | 合并，免去重复键的值
+JSON_MERGE_PRESERVE()       | 合并，保存重复键
+JSON_OBJECT()               | 创建JSON对象
+JSON_QUOTE()                | 加"号
+JSON_REMOVE()               | 指定位置移除
+JSON_REPLACE()              | 指定位置替换
+JSON_SEARCH()               | 查找所有指定值的位置
+JSON_SET()                  | 指定位置设置
+JSON_TYPE()                 | JSON值类型
+JSON_UNQUOTE()              | 去"号
+JSON_VALID()                | 是否有效json格式
