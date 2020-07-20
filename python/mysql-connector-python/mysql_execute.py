@@ -116,11 +116,9 @@ class SqlExecOpr:
         except mysql.connector.Error as err:
             self.err = err
             retcode = False
-            msg = "sql[%s].\nerrmsg[%s]." % (sql, err)
-            msg = '{:<}'.format(msg)
             if g_need_record:
-                print (msg)
-            print_log.write(msg)
+                print("{}".format(err))
+            print_log.write("{}".format(err))
         except:
             retcode = False
             msg = "sql[%s].\nerrmsg[Unkown error message]." % (sql,)
@@ -191,6 +189,19 @@ class SqlExecOpr:
             sql = ""
             errno = 0
             delimiter = ";"
+        except IOError as e:
+            msg = e
+            msg = '{:<}'.format(msg)
+            print (msg)
+            print_log.write(msg)
+            return False
+        except:
+            msg = "Unkown error happens, file path[%s]." % file_path
+            msg = '{:<}'.format(msg)
+            print (msg)
+            print_log.write(msg)
+            return False
+        else:
             for line in self.lines:
                 # 如果是空行, 略过
                 if "" == line.strip():
@@ -230,69 +241,59 @@ class SqlExecOpr:
                     errno = int(re_error.group(1).strip())
                 # sql语句
                 else:
-                    if delimiter in line:
-                        if ";" == delimiter:
-                            sql = sql + line.strip()
-                        else:
-                            sql = sql + line.strip().replace(delimiter, "", 1)
-                        if self.execute(sql):
-                            # select/show 要有记录
-                            if check_sql_has_record(sql):
-                                print_result.write(sql.strip())
-                                # 打印列名
-                                colname = ""
-                                for col in self.cols:
-                                    colname = colname + str(col[0]) + '\t'
-                                colname = colname.strip()
-                                print_result.write(colname)
-                                record = ""
-                                # 结果集为空时, 不判断会报错
-                                # if self.rows:
-                                for row in self.rows:
-                                    for column in row:
-                                        # 为什么不加str()就报错?
-                                        record = record + str(column) + '\t'
-                                    record = record.strip() + '\n'
-                                record = record.replace("None", "NULL")
-                                print_result.write(record.strip())
-                            else:
-                                print_result.write(sql.strip())
-                        # 执行sql失败
-                        else:
-                            if errno != self.err.errno:
-                                print("query '%s' failed with wrong errno %d: '%s', instead of %d..." % (sql, self.err.errno, self.err.msg, errno))
-                                # 为什么会报Unkown error happens, file path...
-                                sys.exit()
-                            # 重置errno
-                            errno = 0
-                            print_result.write(sql.strip())
-                            errmsg = "ERROR " + self.err.sqlstate + ": " + self.err.msg
-                            print_result.write(errmsg.strip())
-                            retcode = False
+                    retcode = self.handle_sql(delimiter, line, sql, errno, print_result)
 
-                        # 执行完一条语句, 重置sql
-                        sql = ""
-                    else:
-                        sql = sql + line.lstrip()
-                        continue
-  
-        except IOError as e:
-            msg = e
-            msg = '{:<}'.format(msg)
-            print (msg)
-            print_log.write(msg)
-            return False
-        except:
-            msg = "Unkown error happens, file path[%s]." % file_path
-            msg = '{:<}'.format(msg)
-            print (msg)
-            print_log.write(msg)
-            return False
-        
         self.CloseFile(file_path)
         print_result.close()
         return retcode
 
+    def handle_sql(self, delimiter, line, sql, errno, print_result):
+        retcode = True
+        if delimiter in line:
+            if ";" == delimiter:
+                sql = sql + line.strip()
+            else:
+                sql = sql + line.strip().replace(delimiter, "", 1)
+            if self.execute(sql):
+                # select/show 要有记录
+                if check_sql_has_record(sql):
+                    print_result.write(sql.strip())
+                    # 打印列名
+                    colname = ""
+                    for col in self.cols:
+                        colname = colname + str(col[0]) + '\t'
+                    colname = colname.strip()
+                    print_result.write(colname)
+                    record = ""
+                    # 结果集为空时, 不判断会报错
+                    # if self.rows:
+                    for row in self.rows:
+                        for column in row:
+                            # 为什么不加str()就报错?
+                            record = record + str(column) + '\t'
+                        record = record.strip() + '\n'
+                    record = record.replace("None", "NULL")
+                    print_result.write(record.strip())
+                else:
+                    print_result.write(sql.strip())
+            # 执行sql失败
+            else:
+                if errno != self.err.errno:
+                    print("query '%s' failed with wrong errno %d: '%s', instead of %d..." % (sql, self.err.errno, self.err.msg, errno))
+                    # 为什么会报Unkown error happens, file path...
+                    sys.exit()
+                # 重置errno
+                errno = 0
+                print_result.write(sql.strip())
+                errmsg = "ERROR " + self.err.sqlstate + ": " + self.err.msg
+                print_result.write(errmsg.strip())
+                retcode = False
+
+            # 执行完一条语句, 重置sql
+            sql = ""
+        else:
+            sql = sql + line.lstrip()
+        return retcode
 
     def compare_test_file(self, prepare_file, normal_file):
         '''

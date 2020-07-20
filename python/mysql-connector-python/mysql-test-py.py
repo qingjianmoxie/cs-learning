@@ -9,6 +9,9 @@ import mysql.connector
 import log_output
 from log_output import print_log
 
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 g_test_tool_version = 1.0
 g_analyze_files     = []
 g_test_dir          = "./t"
