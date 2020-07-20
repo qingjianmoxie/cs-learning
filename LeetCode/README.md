@@ -35,6 +35,7 @@
 * [35_搜索插入位置(easy)](./35_search-insert-position.md)
 * [61_旋转链表](./61_rotate-list.md)
 * [125_验证回文串(easy)](./125_valid-palindrome.md)
+* [167_两数之和 II - 输入有序数组(easy)](./167_two-sum-ii-input-array-is-sorted.md)
 * [206_反转链表](./206_reverse-linked-list.md)
 
 ## 栈
