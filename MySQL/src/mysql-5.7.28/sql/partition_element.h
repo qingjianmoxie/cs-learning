@@ -1,16 +1,23 @@
 #ifndef PARTITION_ELEMENT_INCLUDED
 #define PARTITION_ELEMENT_INCLUDED
 
-/* Copyright (c) 2005, 2010, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (c) 2005, 2015, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; version 2 of the License.
+   it under the terms of the GNU General Public License, version 2.0,
+   as published by the Free Software Foundation.
+
+   This program is also distributed with certain software (including
+   but not limited to OpenSSL) that is licensed under separate terms,
+   as designated in a particular file or component or in included license
+   documentation.  The authors of MySQL hereby grant you an additional
+   permission to link the program and your derivative works with the
+   separately licensed software that they have included with MySQL.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU General Public License, version 2.0, for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
@@ -48,8 +55,6 @@ enum partition_state {
   The value can be either of MINVALUE, MAXVALUE and an expression that
   must be constant and evaluate to the same type as the column it
   represents.
-  此结构用于跟踪列表达式，与范围和列表分区一起作为列概念的一部分。
-  该值可以是MINVALUE、MAXVALUE，也可以是一个表达式，该表达式必须是常量，并且其计算结果与它所表示的列的类型相同。
 
   The data in this fixed in two steps. The parser will only fill in whether
   it is a max_value or provide an expression. Filling in
@@ -59,11 +64,6 @@ enum partition_state {
   To distinguish between those two variants, fixed= 1 after the
   fixing in add_column_list_values and fixed= 2 otherwise. This is
   since the fixing in add_column_list_values isn't a complete fixing.
-  这里的数据分两步填充. 解析器仅仅填充最大值或者提供表达式.
-  函数fix_column_value_function用来填充column_value, part_info, partition_id, null_value.
-  但是, item tree在写入frm文件(在add_column_list_values中)之前, 也需要填充.
-  为了区分这两个变量, 在填充add_column_list_values后fixed= 1, 否则fixed= 2.
-  这是因为add_column_list_values中的填充是不完全的.
 */
 
 typedef struct p_column_list_val
@@ -99,18 +99,17 @@ struct st_ddl_log_memory_entry;
 class partition_element :public Sql_alloc {
 public:
   List<partition_element> subpartitions;
-  List<part_elem_value> list_val_list;
+  List<part_elem_value> list_val_list;  // list of LIST values/column arrays
   ha_rows part_max_rows;
   ha_rows part_min_rows;
   longlong range_value;
-  char *partition_name;
-  char *tablespace_name;
+  const char *partition_name;
+  const char *tablespace_name;
   struct st_ddl_log_memory_entry *log_entry;
   char* part_comment;
-  char* data_file_name;
-  char* index_file_name;
+  const char* data_file_name;
+  const char* index_file_name;
   handlerton *engine_type;
-  LEX_STRING connect_string;
   enum partition_state part_state;
   uint16 nodegroup_id;
   bool has_null_value;
@@ -122,7 +121,7 @@ public:
     partition_name(NULL), tablespace_name(NULL),
     log_entry(NULL), part_comment(NULL),
     data_file_name(NULL), index_file_name(NULL),
-    engine_type(NULL), connect_string(null_lex_str), part_state(PART_NORMAL),
+    engine_type(NULL), part_state(PART_NORMAL),
     nodegroup_id(UNDEF_NODEGROUP), has_null_value(FALSE),
     signed_flag(FALSE), max_value(FALSE)
   {
@@ -136,11 +135,26 @@ public:
     data_file_name(part_elem->data_file_name),
     index_file_name(part_elem->index_file_name),
     engine_type(part_elem->engine_type),
-    connect_string(null_lex_str),
     part_state(part_elem->part_state),
     nodegroup_id(part_elem->nodegroup_id),
     has_null_value(FALSE)
   {
+  }
+  inline void set_from_info(const HA_CREATE_INFO* info)
+  {
+    data_file_name= info->data_file_name;
+    index_file_name= info->index_file_name;
+    tablespace_name= info->tablespace;
+    part_max_rows= info->max_rows;
+    part_min_rows= info->min_rows;
+  }
+  inline void put_to_info(HA_CREATE_INFO* info) const
+  {
+    info->data_file_name= data_file_name;
+    info->index_file_name= index_file_name;
+    info->tablespace= tablespace_name;
+    info->max_rows= part_max_rows;
+    info->min_rows= part_min_rows;
   }
   ~partition_element() {}
 };
