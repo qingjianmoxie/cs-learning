@@ -77,6 +77,7 @@
 * [44_通配符匹配(hard)](./44_wildcard-matching.md)
 * [70_爬楼梯(easy)](./70_climbing-stairs.md)
 * [72_编辑距离(hard)](./72_edit-distance.md)**详解**
+* [95_不同的二叉搜索树 II(medium)](./95_unique-binary-search-trees-ii.md)
 * [96_不同的二叉搜索树(medium)](./96_unique-binary-search-trees.md)
 * [97_交错字符串(hard)](./97_interleaving-string.md)
 * [300_最长上升子序列(medium)](./300_longest-increasing-subsequence.md)**详解**
