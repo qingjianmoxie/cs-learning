@@ -8,10 +8,11 @@
 * [26_删除排序数组中的重复项(easy)](./26_remove-duplicates-from-sorted-array.md)
 * [27_移除元素(easy)](./27_remove-element.md)
 * [31_下一个排列(medium)](./31_next-permutation.md)
-* [33_搜索旋转排序数组(medium)](./33_search-in-rotated-sorted-array.md)
+* [33_搜索旋转排序数组(medium)](./33_search-in-rotated-sorted-array.md)**fuck**
 * [34_在排序数组中查找元素的第一个和最后一个位置(medium)](./34_find-first-and-last-position-of-element-in-sorted-array.md)
 * [39_组合总和(medium)](./39_combination-sum.md)
 * [53_最大子序和](./53_maximum-subarray.md)
+* [154_寻找旋转排序数组中的最小值II(easy)](./154_find-minimum-in-rotated-sorted-array-ii.md)
 * [350_两个数组的交集II(easy)](./350_intersection-of-two-arrays-ii.md)
 * [509_斐波那契数(easy)](./509_fibonacci-number.md)
 * [718_最长重复子数组(medium)](./718_maximum-length-of-repeated-subarray.md)
