@@ -182,4 +182,8 @@ function_call_generic:
           }
 ```
 
-寻找hash表中是否有JSON_TYPE函数, 有的话调用这个类的`create_func`成员函数
+寻找hash表中是否有JSON_TYPE函数, 有的话调用这个类的`create_func`成员函数.
+
+## 二进制
+
+sql/json_binary.h这个文件具体说明了将json值序列化为二进制的接口, 以及从二进制中读取json值的接口.
