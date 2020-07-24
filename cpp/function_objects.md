@@ -1,6 +1,33 @@
-# 函数对象
+# 函数对象(仿函数)
 
-如果一个类将()运算符重载为成员函数，这个类就称为函数对象类，这个类的对象就是函数对象。函数对象是一个对象，但是使用的形式看起来像函数调用，实际上也执行了函数调用，因而得名。
+## 什么是仿函数
+
+**仿函数的主要功能是为了搭配STL算法使用，单独使用仿函数的情况比较少。**
+
+仿函数(functors)在C++标准中采用的名称是函数对象(function objects)。仿函数主要用于STL中的算法中，虽然函数指针虽然也可以作为算法的参数，但是函数指针不能满足STL对抽象性的要求，也无法和STL其他组件搭配，产生更灵活变化。仿函数本质就是类重载了一个operator()，创建一个行为类似函数的对象。
+
+对于重载了()操作符的类，可以实现类似函数调用的过程，所以叫做仿函数，实际上仿函数对象仅仅占用1字节，因为内部没有数据成员，仅仅是一个重载的方法而已。实际上可以通过传递函数指针实现类似的功能，但是为了和STL内部配合使用，他提供了仿函数的特性。
+
+```c++
+#include <iostream>
+using std::cout;
+using std::endl;
+struct MyPlus {
+    int operator()(const int &a, const int &b) const { return a + b; }
+};
+
+int main() {
+    MyPlus a;
+    cout << MyPlus()(1, 2) << endl;  // 1、通过产生临时对象调用重载运算符
+    cout << a.operator()(1, 2) << endl;  // 2、通过对象显示调用重载运算符
+    cout << a(1, 2) << endl;  // 3、通过对象类似函数调用 隐示地调用重载运算符
+    return 0;
+}
+```
+
+在STL中，当需要传递仿函数对象的时候，通过采用上述第1种方法，因为传递进去仅仅为了给容器内部成员赋值，所以没有必要生成对象，产生临时对象即可。
+
+如果一个类将`()`运算符重载为成员函数，这个类就称为函数对象类，这个类的对象就是函数对象。函数对象是一个对象，但是使用的形式看起来像函数调用，实际上也执行了函数调用，因而得名。
 
 下面是一个函数对象的例子。
 ```c++
@@ -47,58 +74,49 @@ T accumulate(InIt first, Init last, T init, Pred op)
 
 下面的程序通过 accumulate 模板求一个 vector 中元素的平方和，其中用到了函数对象。
 ```c++
-#include <iostream>
-#include <vector>
-#include <numeric> //accumulate 在此头文件定义
-using namespace std;
-template <class T>
-void PrintInterval(T first, T last)
-{ //输出区间[first,last)中的元素
-    for (; first != last; ++first)
-        cout << *first << " ";
-    cout << endl;
-}
-int SumSquares(int total, int value)
-{
-    return total + value * value;
-}
-template<class T>
-class SumPowers
-{
-private:
-    int power;
-public:
-    SumPowers(int p) :power(p) { }
-    const T operator() (const T & total, const T & value)
-    { //计算 value的power次方，加到total上
-        T v = value;
-        for (int i = 0; i < power - 1; ++i)
-            v = v * value;
-        return total + v;
-    }
-};
-int main()
-{
-    const int SIZE = 10;
-    int a1[] = { 1,2,3,4,5,6,7,8,9,10 };
-    vector<int> v(a1, a1 + SIZE);
-    cout << "1) "; PrintInterval(v.begin(), v.end());
-    int result = accumulate(v.begin(), v.end(), 0, SumSquares);
-    cout << "2) 平方和：" << result << endl;
-    result = accumulate(v.begin(), v.end(), 0, SumPowers<int>(3));
-    cout << "3) 立方和：" << result << endl;
-    result = accumulate(v.begin(), v.end(), 0, SumPowers<int>(4));
-    cout << "4) 4次方和：" << result;
-    return 0;
-}
+/* 01 */ #include <iostream>
+/* 02 */ #include <numeric>  //accumulate 在此头文件定义
+/* 03 */ #include <vector>
+/* 04 */ using namespace std;
+/* 05 */ 
+/* 06 */ int SumSquares(int total, int value) { return total + value * value; }
+/* 07 */ 
+/* 08 */ template <class T>
+/* 09 */ class SumPowers {
+/* 10 */ private:
+/* 11 */     int power;
+/* 12 */ 
+/* 13 */ public:
+/* 14 */     // 构造函数
+/* 15 */     SumPowers(int p) : power(p) {}
+/* 16 */     const T operator()(const T& total, const T& value) {
+/* 17 */         //计算 value的power次方，加到total上
+/* 18 */         T v = value;
+/* 19 */         for (int i = 0; i < power - 1; ++i) {
+/* 20 */             v = v * value;
+/* 21 */         }
+/* 22 */         return total + v;
+/* 23 */     }
+/* 24 */ };
+/* 25 */ 
+/* 26 */ int main() {
+/* 27 */     vector<int> v({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+/* 28 */     int result = accumulate(v.begin(), v.end(), 0, SumSquares);
+/* 29 */     cout << "平方和：" << result << endl;
+/* 30 */     result = accumulate(v.begin(), v.end(), 0, SumPowers<int>(3));
+/* 31 */     cout << "立方和：" << result << endl;
+/* 32 */     result = accumulate(v.begin(), v.end(), 0, SumPowers<int>(4));
+/* 33 */     cout << "4次方和：" << result;
+/* 34 */     return 0;
+/* 35 */ }
 ```
 程序的输出结果如下：
-1)1 2 3 4 5 6 7 8 9 10
-2)平方和:385
-3)立方和3025
-4)4次方和:25333
 
-第 37 行，第四个参数是 SumSquares 函数的名字。函数名字的类型是函数指针，因此本行将 accumulate 模板实例化后得到的模板函数定义如下：
+    平方和:385
+    立方和3025
+    4次方和:25333
+
+第 28 行，第四个参数是 SumSquares 函数的名字。函数名字的类型是函数指针，因此本行将 accumulate 模板实例化后得到的模板函数定义如下：
 ```c++
 int accumulate(vector <int>::iterator first, vector <int>::iterator last, int init, int(*op)(int, int))
 {
@@ -108,9 +126,9 @@ int accumulate(vector <int>::iterator first, vector <int>::iterator last, int in
 }
 ```
 
-形参 op 是一个函数指针，而op(init, *first)就调用了指针 op 指向的函数，在第 37 行的情况下就是函数 SumSquares。
+形参 op 是一个函数指针，而op(init, *first)就调用了指针 op 指向的函数，在第 28 行的情况下就是函数 SumSquares。
 
-第 39 行，第四个参数是 SumPowers<int>(3)。SumPowers 是类模板的名字，SumPowers<int> 就是类的名字。类的名字后面跟着构造函数的参数列表，就代表一个临时对象。因此 SumPowers<int>(3) 就是一个 SumPowers<int> 类的临时对象。
+第 30 行，第四个参数是 SumPowers<int>(3)。SumPowers 是类模板的名字，SumPowers<int> 就是类的名字。类的名字后面跟着构造函数的参数列表，就代表一个临时对象。因此 SumPowers<int>(3) 就是一个 SumPowers<int> 类的临时对象。
 
 编译器在编译此行时，会将 accumulate 模板实例化成以下函数：
 ```c++
@@ -145,56 +163,59 @@ void sort(_Randlt first, _RandIt last, Pred op);
 ```
 这个版本和第一个版本的差别在于，元素 a、b 比较大小是通过表达式op(a, b)进行的。如果该表达式的值为 true，则a比b小；如果该表达式的值为false，也不能认为b比a小，还要看op(b, a)的值。总之，op 定义了元素比较大小的规则。下面是一个使用 sort 算法的例子。
 ```c++
-#include <iostream>
-#include <algorithm>  //sort算法在此头文件中定义
-using namespace std;
-template <class T>
-void Printlnterva1(T first, T last)
-{  //用以输出 [first, last) 区间中的元素
-    for (; first != last; ++first)
-        cout << *first << " ";
-    cout << endl;
-}
-class A
-{
-public:
-    int v;
-    A(int n) : v(n) {}
-};
-bool operator < (const A & a1, const A & a2)
-{  //重载为 A 的 const 成员函数也可以，重载为非 const 成员函数在某些编译器上会出错
-    return a1.v < a2.v;
-}
-bool GreaterA(const A & a1, const A & a2)
-{  //v值大的元素作为较小的数
-    return a1.v > a2.v;
-}
-struct LessA
-{
-    bool operator() (const A & a1, const A & a2)
-    {  //v的个位数小的元素就作为较小的数
-        return (a1.v % 10) < (a2.v % 10);
-    }
-};
-ostream & operator << (ostream & o, const A & a)
-{
-    o << a.v;
-    return o;
-}
-int main()
-{
-    int a1[4] = { 5, 2, 4, 1 };
-    A a2[5] = { 13, 12, 9, 8, 16 };
-    sort(a1, a1 + 4);
-    cout << "1)"; Printlnterva1(a1, a1 + 4);  //输出 1)1 2 4 5
-    sort(a2, a2 + 5);  //按v的值从小到大排序
-    cout << "2)"; Printlnterva1(a2, a2 + 5);  //输出 2)8 9 12 13 16
-    sort(a2, a2 + 5, GreaterA);  //按v的值从大到小排序
-    cout << "3)"; Printlnterva1(a2, a2 + 5);  //输出 3)16 13 12 9 8
-    sort(a2, a2 + 5, LessA());  //按v的个位数从小到大排序
-    cout << "4)"; Printlnterva1(a2, a2 + 5);  //输出 4)12 13 16 8 9
-    return 0;
-}
+/* 01 */ #include <algorithm>  //sort算法在此头文件中定义
+/* 02 */ #include <iostream>
+/* 03 */ using namespace std;
+/* 04 */ 
+/* 05 */ template <class T>
+/* 06 */ void Printlnterva1(T first, T last) {  //用以输出 [first, last) 区间中的元素
+/* 07 */     for (; first != last; ++first) cout << *first << " ";
+/* 08 */     cout << endl;
+/* 09 */ }
+/* 10 */ 
+/* 11 */ class A {
+/* 12 */    public:
+/* 13 */     int v;
+/* 14 */     A(int n) : v(n) {}
+/* 15 */ };
+/* 16 */ bool operator<(const A& a1, const A& a2) {  
+/* 17 */     //重载为 A 的 const 成员函数也可以，重载为非 const 成员函数在某些编译器上会出错
+/* 18 */     return a1.v < a2.v;
+/* 19 */ }
+/* 20 */ bool GreaterA(const A& a1, const A& a2) {  
+/* 21 */     // v值大的元素作为较小的数
+/* 22 */     return a1.v > a2.v;
+/* 23 */ }
+/* 24 */ struct LessA {
+/* 25 */     bool operator()(const A& a1, const A& a2) {  
+/* 26 */         // v的个位数小的元素就作为较小的数
+/* 27 */         return (a1.v % 10) < (a2.v % 10);
+/* 28 */     }
+/* 29 */ };
+/* 30 */ ostream& operator<<(ostream& o, const A& a) {
+/* 31 */     o << a.v;
+/* 32 */     return o;
+/* 33 */ }
+/* 34 */ int main() {
+/* 35 */     int a1[4] = {5, 2, 4, 1};
+/* 36 */     A a2[5] = {13, 12, 9, 8, 16};
+/* 37 */     sort(a1, a1 + 4);
+/* 38 */     cout << "1)";
+/* 39 */     Printlnterva1(a1, a1 + 4);  //输出 1)1 2 4 5
+/* 40 */ 
+/* 41 */     sort(a2, a2 + 5);           //按v的值从小到大排序
+/* 42 */     cout << "2)";
+/* 43 */     Printlnterva1(a2, a2 + 5);   //输出 2)8 9 12 13 16
+/* 44 */ 
+/* 45 */     sort(a2, a2 + 5, GreaterA);  //按v的值从大到小排序
+/* 46 */     cout << "3)";
+/* 47 */     Printlnterva1(a2, a2 + 5);  //输出 3)16 13 12 9 8
+/* 48 */ 
+/* 49 */     sort(a2, a2 + 5, LessA());  //按v的个位数从小到大排序
+/* 50 */     cout << "4)";
+/* 51 */     Printlnterva1(a2, a2 + 5);  //输出 4)12 13 16 8 9
+/* 52 */     return 0;
+/* 53 */ }
 ```
 
 编译至第 45 行时，编译器将 sort 实例化得到的函数原型如下：
@@ -202,7 +223,7 @@ int main()
 
 该函数在执行过程中，当要比较两个元素 a、b 的大小时，就是看 op(a, b) 和 op(b, a) 的返回值。本程序中 op 指向 GreaterA,因此就用 GreaterA 定义的规则来比较大小。
 
-编译至第 47 行时，编译器将 sort 实例化得到的函数原型如下：
+编译至第 49 行时，编译器将 sort 实例化得到的函数原型如下：
 `void sort( A* first, A* last, LessA op);`
 
 该函数在执行过程中，当要比较两个元素 a、b 的大小时，就是看 op(a, b) 和 op(b, a) 的返回值。本程序中，op(a, b) 等价于 op.opeartor(a, b)，因此就用 LessA 定义的规则来比较大小。
@@ -280,7 +301,9 @@ struct less
 ```
 
 要判断两个 int 变量 x、y 中 x 是否比 y 小，可以写：
-`if( less<int>()(x, y) ) { ... }`
+```c++
+if (less<int>()(x, y)) { ... }
+```
 
 ## 引入函数对象后STL中的“大”、“小”和“相等”概念
 

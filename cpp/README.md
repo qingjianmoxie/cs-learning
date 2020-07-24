@@ -30,7 +30,7 @@
   * [vector](./vector.md)
   * [list](./list.md)
   * [deque](./deque.md)
-  * [函数对象](./函数对象.md)
+  * [函数对象(仿函数)](./function_objects.md)
   * [容器适配器](./容器适配器.md)
   * [pair](./pair.md)
   * [map](./map.md)
