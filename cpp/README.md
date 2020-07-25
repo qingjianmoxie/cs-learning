@@ -18,6 +18,7 @@
 * [引用计数与智能指针](./引用计数与智能指针.md)
 * [c++11特性:auto关键字](./auto关键字.md)
 * [c++11特性:decltype关键字](./decltype关键字.md)
+* [c++11特性:lambda表达式](./lambda_expressions.md)
 
 * [模板与泛型编程](./模板与泛型编程.md)
   * [类模板](./类模板.md)
