@@ -67,6 +67,7 @@
 * [139_单词拆分(medium)](./139_word-break.md)
 
 # 树
+* [104_二叉树的最大深度(easy)](./104_maximum-depth-of-binary-tree.md)
 * [108_将有序数组转换为二叉搜索树(easy)](./108_convert-sorted-array-to-binary-search-tree.md)
 * [297_二叉树的序列化与反序列化(hard)](./297_serialize-and-deserialize-binary-tree.md)
 * [1028_从先序遍历还原二叉树(hard)](./1028_recover-a-tree-from-preorder-traversal.md)
