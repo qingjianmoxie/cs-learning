@@ -1,6 +1,9 @@
 # C++11多线程-异步运行之std::packaged_task
-上一篇介绍的std::promise通过set_value可以使得与之关联的std::future获取数据。本篇介绍的std::packaged_task则更为强大，它允许传入一个函数，并将函数计算的结果传递给std::future，包括函数运行时产生的异常。下面我们就来详细介绍一下它。
+
+上一篇介绍的std::promise通过set_value可以使得与之关联的std::future获取数据。本篇介绍的std::packaged_task则更为强大，它允许传入一个函数，并将函数计算的结果传递给std::future，包括函数运行时产生的异常。下面我们就来详细介绍一下它。
+
 ## 2. std::package_task
+
 在开始std::packaged_task之前我们先看一段代码，对std::packaged_task有个直观的印象，然后我们再进一步介绍。
 ```c++
 #include <thread>   // std::thread
@@ -15,7 +18,7 @@ int main() {
     std::packaged_task<int(int,int)> task(sum);
     std::future<int> future = task.get_future();
 
-    // std::promise一样，std::packaged_task支持move，但不支持拷贝
+    // 与std::promise一样，std::packaged_task支持move，但不支持拷贝
     // std::thread的第一个参数不止是函数，还可以是一个可调用对象，即支持operator()(Args...)操作
     std::thread t(std::move(task), 1, 2);
     // 等待异步计算结果
@@ -26,15 +29,19 @@ int main() {
 }
 /// 输出: 1 + 2 => 3
 ```
-std::packaged_task位于头文件```#include <future>```中，是一个模板类
+
+std::packaged_task位于头文件`#include <future>`中，是一个模板类
 ```c++
 template <class R, class... ArgTypes>
 class packaged_task<R(ArgTypes...)>
 ```
-其中R是一个函数或可调用对象，ArgTypes是R的形参。与std::promise一样，std::packaged_task**支持move，但不支持拷贝(copy)**。std::packaged_task封装的函数的计算结果会通过与之联系的std::future::get获取(当然，可以在其它线程中异步获取)。关联的std::future可以通过std::packaged_task::get_future获取到，get_future仅能调用一次，多次调用会触发std::future_error异常。<br/>
+其中R是一个函数或可调用对象，ArgTypes是R的形参。与std::promise一样，std::packaged_task**支持move，但不支持拷贝(copy)**。std::packaged_task封装的函数的计算结果会通过与之联系的std::future::get获取(当然，可以在其它线程中异步获取)。关联的std::future可以通过std::packaged_task::get_future获取到，get_future仅能调用一次，多次调用会触发std::future_error异常。
+
 std::package_task除了可以通过可调用对象构造外，还支持缺省构造(无参构造)。但此时构造的对象不能直接使用，需通过右值赋值操作设置了可调用对象或函数后才可使用。判断一个std::packaged_task是否可使用，可通过其成员函数valid来判断。
+
 ### 2.1 std::packaged_task::valid
-该函数用于判断std::packaged_task对象是否是有效状态。当通过缺省构造初始化时，由于其未设置任何可调用对象或函数，valid会返回false。只有当std::packaged_task设置了有效的函数或可调用对象，valid才返回true
+
+该函数用于判断std::packaged_task对象是否是有效状态。当通过缺省构造初始化时，由于其未设置任何可调用对象或函数，valid会返回false。只有当std::packaged_task设置了有效的函数或可调用对象，valid才返回true
 ```c++
 #include <future>   // std::packaged_task, std::future
 #include <iostream> // std::cout
@@ -53,13 +60,13 @@ int main() {
 }
 ```
 上面的示例演示了几种valid为false的情况，程序输出如下
-```console
-false
-false
-true
-```
+
+    false
+    false
+    true
 
 ### 2.2 std::packaged_task::operator()(ArgTypes...)
+
 该函数会调用std::packaged_task对象所封装可调用对象R，但其函数原型与R稍有不同:
 ```c++
 void operator()(ArgTypes... );
@@ -87,7 +94,8 @@ int main() {
 }
 /// Clang下输出: St11logic_error: will catch in future
 ```
-为了帮忙大家更好的了解该函数，下面将Clang下精简过的operator()(Args...)的实现贴出，以便于更好理解该函数的边界，明确什么可以做，什么不可以做。
+
+为了帮忙大家更好的了解该函数，下面将Clang下精简过的operator()(Args...)的实现贴出，以便于更好理解该函数的边界，明确什么可以做，什么不可以做。
 ```c++
 template<class _Rp, class ..._ArgTypes>
 class packaged_task<_Rp(_ArgTypes...)> {
@@ -111,9 +119,13 @@ public:
     }
 };
 ```
+
 ### 2.3 让std::packaged_task在线程退出时再将结果反馈给std::future
+
 std::packaged_task::make_ready_at_thread_exit函数接收的参数与operator()(_ArgTypes...)一样，行为也一样。只有一点差别，那就是不会将计算结果立刻反馈给std::future，而是在其执行时所在的线程结束后，std::future::get才会取得结果。
+
 ### 2.4 std::packaged_task::reset
+
 与std::promise不一样， std::promise仅可以执行一次set_value或set_exception函数，但std::packagged_task可以执行多次，其奥秘就是reset函数
 ```c++
 template<class _Rp, class ..._ArgTypes>
@@ -124,12 +136,12 @@ void packaged_task<_Rp(_ArgTypes...)>::reset()
     __p_ = promise<result_type>();
 }
 ```
-通过重新构造一个promise来达到多次调用的目的。显然调用reset后，需要重新get_future，以便获取下次operator()执行的结果。由于是重新构造了promise，因此reset操作并不会影响之前调用的make_ready_at_thread_exit结果，也即之前的定制的行为在线程退出时仍会发生。
+通过重新构造一个promise来达到多次调用的目的。显然调用reset后，需要重新get_future，以便获取下次operator()执行的结果。由于是重新构造了promise，因此reset操作并不会影响之前调用的make_ready_at_thread_exit结果，也即之前的定制的行为在线程退出时仍会发生。
 
-std::packaged_task就介绍到这里，下一篇将会完成本次异步运行的整体脉络，将std::async和std::future一起介绍结大家。
+std::packaged_task就介绍到这里，下一篇将会完成本次异步运行的整体脉络，将std::async和std::future一起介绍给大家。
 
-## 附: C++11多线程中的样例代码的编译及运行
-```console
-g++ -std=c++11 <Your Cpp File>
-./a.out
-```
+## 链接
+
+- [目录](README.md)
+- 上一节：[C++11多线程-异步运行(1)之promise](./C++11多线程-async-1-promise.md)
+- 下一节：[C++11多线程-异步运行(3)之最终篇(future+async)](./C++11多线程-async-3-future.md)

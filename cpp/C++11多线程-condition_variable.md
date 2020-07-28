@@ -91,5 +91,5 @@ int main() {
 }
 ```
 ## 源码:
-[chan.h](./code/chan.h) <br/>
-chan.h的简化版，方便理解std::mutex, std::condition_variable: [chan.simple.h](./code/chan.simple.h)
+[chan.h](./src/chan.h) <br/>
+chan.h的简化版，方便理解std::mutex, std::condition_variable: [chan.simple.h](./src/chan.simple.h)
