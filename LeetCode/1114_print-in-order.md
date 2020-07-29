@@ -44,26 +44,39 @@
 ```c++
 class Foo {
 public:
-    Foo() {
-        
-    }
+    Foo() {}
 
     void first(function<void()> printFirst) {
-        
+        // 等待直至 main() 发送数据
+        std::unique_lock<std::mutex> lk(mutex_);
         // printFirst() outputs "first". Do not change or remove this line.
         printFirst();
+        // 通知前完成手动解锁，以避免等待线程才被唤醒就阻塞（细节见 notify_one）
+        counter_++;
+        cv1_.notify_one();
     }
 
     void second(function<void()> printSecond) {
-        
+        std::unique_lock<std::mutex> lk(mutex_);
+        cv1_.wait(lk, [this]() { return counter_ == 2; });  // 阻塞当前线程，直到条件变量被唤醒
         // printSecond() outputs "second". Do not change or remove this line.
         printSecond();
+        counter_++;
+        cv2_.notify_one();
     }
 
     void third(function<void()> printThird) {
-        
+        std::unique_lock<std::mutex> lk(mutex_);
+        cv2_.wait(lk, [this]() { return counter_ == 3; });
         // printThird() outputs "third". Do not change or remove this line.
         printThird();
     }
+
+private:
+    int counter_ = 1;
+    std::condition_variable cv1_;
+    std::condition_variable cv2_;
+    // 使用lock和unlock手动加锁
+    std::mutex mutex_;
 };
 ```
