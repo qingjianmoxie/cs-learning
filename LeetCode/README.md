@@ -96,7 +96,8 @@
 * [17.13_恢复空格(medium)](./17.13_re-space-lcci.md)
 
 ## 多线程
-* [1114_按序打印](./1114_print-in-order.md)
+* [1114_按序打印(easy)](./1114_print-in-order.md)
+* [1115_交替打印FooBar(medium)](./1115_print-foobar-alternately.md)
 
 ## 数学
 * [9_回文数(easy)](./9_palindrome-number.md)
