@@ -132,7 +132,7 @@ lock_guard(lock_guard const&) = delete;
 lock_guard& operator=(lock_guard const&) = delete;
 ```
 
-lock_guard的设计保证了即使程序在锁定期间发生了异常，也会安全的释放锁，不会发生死锁。
+lock_guard的设计保证了即使程序在锁定期间发生了异常，也会安全的释放锁，不会发生死锁。代码如下所示:
 
 ```c++
 #include <iostream>
@@ -144,7 +144,8 @@ void safe_thread() {
     try {
         std::lock_guard<std::mutex> _guard(mutex);
         throw std::logic_error("logic error");
-    } catch (std::exception &ex) {
+    }
+    catch (std::exception &ex) {
         std::cerr << "[caught] " << ex.what() << std::endl;
     }
 }
@@ -164,6 +165,8 @@ int main() {
 
     [caught] logic error
     OK, still locked
+
+异常处理的相关知识可以点[这里](./try_catch_throw.md)
 
 ## unique_lock
 
@@ -283,4 +286,4 @@ template <class L1, class L2, class... L3>
 
 - [目录](README.md)
 - 上一节：[C++11多线程](./C++11多线程.md)
-- 下一节：[C++11多线程-条件变量](./C++11多线程-条件变量.md)
+- 下一节：[C++11多线程-条件变量](./C++11多线程-condition_variable.md)
