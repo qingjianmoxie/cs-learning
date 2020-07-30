@@ -8,6 +8,7 @@
 * [data structure analysis - MEM_ROOT](./data_structure_analysis-MEM_ROOT.md)
 * [data structure analysis - IO_CACHE](./data_structure_analysis-IO_CACHE.md)
 * [Item对象及子对象解析](./Item对象及子对象解析.md)
+* [item和field解析](./item&field.md)
 * [The Item Class](./The_Item_Class.md)
 * [CREATE TABLE ... SELECT Statement](./create_select.md)
 * [json数据类型](./json数据类型.md)
