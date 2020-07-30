@@ -80,3 +80,44 @@ private:
     std::mutex mutex_;
 };
 ```
+
+使用一个条件变量也可以
+
+```c++
+class Foo {
+public:
+    Foo() : counter_(1) {}
+
+    void first(function<void()> printFirst) {
+        // 等待直至 main() 发送数据
+        std::lock_guard<std::mutex> lk(mutex_);
+        // printFirst() outputs "first". Do not change or remove this line.
+        printFirst();
+        // 通知前完成手动解锁，以避免等待线程才被唤醒就阻塞（细节见 notify_one）
+        counter_++;
+        cv_.notify_all();
+    }
+
+    void second(function<void()> printSecond) {
+        std::unique_lock<std::mutex> lk(mutex_);
+        cv_.wait(lk, [this]() { return counter_ == 2; });  // 阻塞当前线程，直到条件变量被唤醒
+        // printSecond() outputs "second". Do not change or remove this line.
+        printSecond();
+        counter_++;
+        cv_.notify_all();
+    }
+
+    void third(function<void()> printThird) {
+        std::unique_lock<std::mutex> lk(mutex_);
+        cv_.wait(lk, [this]() { return counter_ == 3; });
+        // printThird() outputs "third". Do not change or remove this line.
+        printThird();
+    }
+
+private:
+    int counter_;
+    std::condition_variable cv_;
+    // 使用lock和unlock手动加锁
+    std::mutex mutex_;
+};
+```
