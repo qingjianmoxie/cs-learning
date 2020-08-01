@@ -23,6 +23,7 @@
   * [decltype关键字](./decltype关键字.md)
   * [lambda表达式](./lambda_expressions.md)
   * [chrono库](./chrono.md)
+  * [enum class](./enum_class.md)
 
 * keywords
   * [explicit关键字](./explicit.md)
@@ -36,6 +37,7 @@
   * [STL算法](./STL算法.md)
   * [STL中“大”、“小”和“相等”的概念](./STL中“大”、“小”和“相等”的概念.md)
   * [vector](./vector.md)
+  * [vector的reserve和resize](./vector的reserve和resize.md)
   * [list](./list.md)
   * [deque](./deque.md)
   * [函数对象(仿函数)](./function_objects.md)
