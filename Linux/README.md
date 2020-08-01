@@ -1,6 +1,7 @@
 # Linux
 
 * [MSB与LSB](./MSB与LSB.md)
+* [useradd与adduser](./useradd&adduser.md)
 
 * [解压压缩命令](./解压压缩命令.md)
 * [core dump](./core_dump.md)
