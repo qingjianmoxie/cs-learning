@@ -9,6 +9,7 @@ IO_CACHE数据结构的定义在MySQL源码的/include/my_sys.h文件中，该�
 ### cache_type
 
 cache_type枚举类型定义了6种cache的操作类型，包括读、写、顺序读、队列读、网络读、网络写。cache根据操作类型的不同，处理的方式和策略也不同。
+(mariadb10.2.32, mysql5.7.28)
 ```c++
 enum cache_type
 {
@@ -24,6 +25,7 @@ IO_CACHE_CALLBACK是一个回调函数，输入参数是IO_CACHE数据类型。�
 ### IO_CACHE_SHARE
 
 IO_CACHE_SHARE数据结构是用于多线程共享读cache的情况下，cache共享的处理策略。具体各个参数的含义，注释中都详细介绍。
+(mariadb10.2.32)
 ```c++
 typedef struct st_io_cache_share
 {
@@ -49,6 +51,13 @@ typedef struct st_io_cache_share
 ### IO_CACHE
 
 IO_CACHE数据结构是包含了cache文件处理的各种参数和读写处理函数。具体参数的含义，参考注释。进一步的了解，查看以下源码中处理函数的逻辑和流程图。
+(mysql5.7.28)
+
+变量名 | 用途
+:- | :-
+read_pos | 指向在buffer中当前读位置的指针
+read_end | buffer中当前有效读取的非包含边界
+
 ```c++
 typedef struct st_io_cache		/* Used when cacheing files */
 {
@@ -144,6 +153,8 @@ typedef struct st_io_cache		/* Used when cacheing files */
   char *file_name;			/* if used with 'open_cached_file' */
   char *dir,*prefix;
   File file; /* file descriptor */
+  PSI_file_key file_key; /* instrumented file key */
+
   /*
     seek_not_done is set by my_b_seek() to inform the upcoming read/write
     operation that a seek needs to be preformed prior to the actual I/O
@@ -164,15 +175,6 @@ typedef struct st_io_cache		/* Used when cacheing files */
     somewhere else
   */
   my_bool alloced_buffer;
-#ifdef HAVE_AIOWAIT
-  /*
-    As inidicated by ifdef, this is for async I/O, which is not currently
-    used (because it's not reliable on all systems)
-  */
-  uint inited;
-  my_off_t aio_read_pos;
-  my_aio_result aio_result;
-#endif
 } IO_CACHE;
 ```
 
@@ -184,11 +186,11 @@ typedef struct st_io_cache		/* Used when cacheing files */
 
 init_functions()函数用于根据不同的CACHE类型，初始化IO_CACHE的read_function和write_function函数。
 如果CACHE类型为READ_NET，会根据实际的调用者进行初始化；
-如果CACHE类型为SEQ_READ_APPEND，read_function函数为_my_b_seq_read()处理过程；
-默认情况下，如果可以多线程共享读，那么read_function函数为多线程共享读函数_my_b_read_r()，否则为_my_b_read()处理函数。write_function函数为_my_b_write()处理函数。这些处理函数是IO_CACHE的主要处理逻辑，将在以下的内容中详细说明。
+如果CACHE类型为SEQ_READ_APPEND，read_function函数为`_my_b_seq_read()`处理过程；
+默认情况下，如果可以多线程共享读，那么read_function函数为多线程共享读函数`_my_b_read_r()`，否则为_my_b_read()处理函数。write_function函数为_my_b_write()处理函数。这些处理函数是IO_CACHE的主要处理逻辑，将在以下的内容中详细说明。
 
 该函数在init_io_cache函数初始化IO_CACHE对象时调用，初始化read_function和write_function函数。
-
+(mysql5.7.28)
 ```c++
 static void
 init_functions(IO_CACHE* info)
@@ -221,10 +223,23 @@ init_functions(IO_CACHE* info)
 
 init_io_cache()函数是IO_CACHE对象的初始化函数。具体初始化IO_CACHE的值如下图1所示。
 
+类型 | 变量名 | 初始值
+:- | :- | :-
+my_off_t | pos_in_file | seek_offset
+my_off_t | end_of_file | 1) seek_offset:<br>SEEK_END\<seek_offset<br>2)SEEK_END(存疑)
+uchar	* | read_pos | info->buffer
+uchar * | read_end | info->buffer
+uchar * | buffer | info->buffer= (uchar*) my_malloc(key_memory_IO_CACHE, buffer_block, flags)
+
 ![图1 init_io_cache()初始化](http://blog.chinaunix.net/attachment/201212/7/26896862_1354849242233L.jpg)
 图1 init_io_cache()初始化
 
-根据输入的文件描述符file，确定seek_not_done的值，该值用于通知读写操作需要首先调用seek函数，查看当前文件位置。根据输入参数cachesize，用于初始化cache的大小，并进一步初始化buffer。然而，实际初始化过程中，该值并不一定是输入的值，init_io_cache()函数会根据不同cache类型和参数进行调整，具体确定cachesize值的处理逻辑如图2所示。输入参数seek_offset用于初始化读写CACHE的起始地址，该值也会影响cachesize的值。输入参数type用于初始化IO_CACHE的cache类型，cache的类型直接关系到IO_CACHE的初始化过程。输入参数use_async_io用于判断是否使用异步IO操作，该值将影响最小CACHE大小，如果使用异步IO，最小CACHE大小为`IO_SIZE*4(IO_SIZE=4096)`，否则为`IO_SIZE*2`。输入参数cache_myflags用于初始化cache的一些标志。
++ 根据输入的文件描述符`file`，确定`seek_not_done`的值，该值用于通知读写操作需要首先调用seek函数，查看当前文件位置。
++ 根据输入参数`cachesize`，用于初始化cache的大小，并进一步初始化buffer。然而，实际初始化过程中，该值并不一定是输入的值，init_io_cache()函数会根据不同cache类型和参数进行调整，具体确定cachesize值的处理逻辑如图2所示。
++ 输入参数`seek_offset`用于初始化读写CACHE的起始地址，该值也会影响cachesize的值。
++ 输入参数`type`用于初始化IO_CACHE的cache类型，cache的类型直接关系到IO_CACHE的初始化过程。
++ 输入参数`use_async_io`用于判断是否使用异步IO操作，该值将影响最小CACHE大小，如果使用异步IO，最小CACHE大小为`IO_SIZE*4(IO_SIZE=4096)`，否则为`IO_SIZE*2`。
++ 输入参数`cache_myflags`用于初始化cache的一些标志。
 
 init_io_cache()函数的逻辑处理流程图如下图2所示，其中主要的思想是根据CACHE的类型和cachesize的值，初始化IO_CACHE的参数。
 
@@ -235,7 +250,7 @@ init_io_cache()函数的逻辑处理流程图如下图2所示，其中主要的�
 
 ### _my_b_read()函数
 
-_my_b_read()函数是默认的非共享读函数read_function。该函数的基本思想是：首先读取当前CACHE中的内容到输入参数Buffer中；然后，如果当前读的数据长度大于IO_SIZE（4096）的值，那么直接从文件中读取（(Count & ~(IO_SIZE-1))-diff_length）长度是内容到Buffer中；最后，从文件中读取IO_CACHE能够存放的最大长度的内容到IO_CACHE的buffer中，然后从IO_CACHE的buffer中读取剩余长度的内容到Buffer中。
+`_my_b_read()`函数是默认的非共享读函数read_function。该函数的基本思想是：首先读取当前CACHE中的内容到输入参数Buffer中；然后，如果当前读的数据长度大于IO_SIZE（4096）的值，那么直接从文件中读取（(Count & ~(IO_SIZE-1))-diff_length）长度是内容到Buffer中；最后，从文件中读取IO_CACHE能够存放的最大长度的内容到IO_CACHE的buffer中，然后从IO_CACHE的buffer中读取剩余长度的内容到Buffer中。
 
 _my_b_read()函数的详细处理逻辑如下图3所示：
 
