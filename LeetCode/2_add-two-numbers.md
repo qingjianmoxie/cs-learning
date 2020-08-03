@@ -73,3 +73,76 @@ public:
     }
 };
 ```
+
+这题和[415_字符串相加(easy)](./415_add-strings.md)神似.
+
+由415题题解想到的另一种写法:
+
+```c++
+class Solution {
+   public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* head = new ListNode(-1);  // 存放结果的链表, 头结点为哨兵
+        ListNode* tail = head;              // 结果链表的尾节点
+        ListNode* p = NULL;                 // 供生成新的节点使用
+        ListNode* tmp1 = l1;
+        ListNode* tmp2 = l2;
+        int carry = 0;  // 是否需要进位的标识符
+        while (tmp1 || tmp2 || 0 != carry) {
+            int x = tmp1 ? tmp1->val : 0;
+            int y = tmp2 ? tmp2->val : 0;
+            int sum = x + y + carry;
+            p = new ListNode(sum % 10);
+            carry = sum / 10;
+            tail->next = p;
+            tail = tail->next;
+            if (tmp1) tmp1 = tmp1->next;
+            if (tmp2) tmp2 = tmp2->next;
+        }
+        /* 返回结果前将哨兵释放, 防止内存泄漏 */
+        ListNode* pDelete = head;
+        head = head->next;
+        delete pDelete;
+        return head;
+    }
+};
+```
+
+又看出来上面代码中tmp1和tmp2判断了两次是否为NULL, 可以改为1次
+
+```c++
+class Solution {
+   public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* head = new ListNode(-1);  // 存放结果的链表, 头结点为哨兵
+        ListNode* tail = head;              // 结果链表的尾节点
+        ListNode* p = NULL;                 // 供生成新的节点使用
+        ListNode* tmp1 = l1;
+        ListNode* tmp2 = l2;
+        int carry = 0;  // 是否需要进位的标识符
+        while (tmp1 || tmp2 || 0 != carry) {
+            int sum = 0;
+            if (tmp1) {
+                sum += tmp1->val;
+                tmp1 = tmp1->next;
+            }
+            if (tmp2) {
+                sum += tmp2->val;
+                tmp2 = tmp2->next;
+            }
+            sum += carry;
+            p = new ListNode(sum % 10);
+            carry = sum / 10;
+            tail->next = p;
+            tail = tail->next;
+        }
+        /* 返回结果前将哨兵释放, 防止内存泄漏 */
+        ListNode* pDelete = head;
+        head = head->next;
+        delete pDelete;
+        return head;
+    }
+};
+```
+
+提交耗时变长了一丢丢, 不知道为啥...
