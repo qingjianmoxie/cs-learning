@@ -73,6 +73,9 @@
 * [297_二叉树的序列化与反序列化(hard)](./297_serialize-and-deserialize-binary-tree.md)
 * [1028_从先序遍历还原二叉树(hard)](./1028_recover-a-tree-from-preorder-traversal.md)
 
+## Trie
+* [336_回文对(hard)](./336_palindrome-pairs.md)
+
 ## 动态规划
 * [5_最长回文子串(medium)](./5_longest-palindromic-substring.md)
 * [10_正则表达式匹配(hard)](./10_regular-expression-matching.md)
