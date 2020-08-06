@@ -24,6 +24,8 @@
   * [lambda表达式](./lambda_expressions.md)
   * [chrono库](./chrono.md)
   * [enum class](./enum_class.md)
+  * [std::function](./std_function.md)
+  * [std::bind](./std_bind.md)
 
 * keywords
   * [explicit关键字](./explicit.md)
