@@ -75,6 +75,7 @@
 
 ## Trie
 * [336_回文对(hard)](./336_palindrome-pairs.md)
+* [677_键值映射(medium)](./677_map-sum-pairs.md)
 
 ## 动态规划
 * [5_最长回文子串(medium)](./5_longest-palindromic-substring.md)
