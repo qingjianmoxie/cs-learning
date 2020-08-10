@@ -346,38 +346,7 @@ ALTER TABLE features ADD INDEX (feature_street);
 
 这样虚拟列的添加和删除都会非常快，而在虚拟列上建立索引跟传统的建立索引的方式并没有区别，会提高虚拟列读取的性能，减慢整体插入的性能。虚拟列的特性结合JSON的路径表达式，可以方便的为用户提供高效的键值索引功能。
 
-## JSON比较与排序
-
-JSON值可以使用=, <, <=, >, >=, <>, !=, <=>等操作符，BETWEEN, IN, GREATEST, LEAST等操作符现在还不支持。JSON值使用的两级排序规则，第一级基于JSON的类型，类型不同的使用每个类型特有的排序规则。
-
-JSON类型按照优先级从高到低为
-
-    BLOB
-    BIT
-    OPAQUE
-    DATETIME
-    TIME
-    DATE
-    BOOLEAN
-    ARRAY
-    OBJECT
-    STRING
-    INTEGER, DOUBLE
-    NULL
-
-优先级高的类型大，不用再进行其他的比较操作；如果类型相同，每个类型按自己的规则排序。具体的规则如下：
-
-1. BLOB/BIT/OPAQUE: 比较两个值前N个字节，如果前N个字节相同，短的值小
-2. DATETIME/TIME/DATE: 按照所表示的时间点排序
-3. BOOLEAN: false小于true
-4. ARRAY: 两个数组如果长度和在每个位置的值相同时相等，如果不相等，取第一个不相同元素的排序结果，空元素最小
-5. OBJECT: 如果两个对象有相同的KEY，并且KEY对应的VALUE也都相同，两者相等。否则，两者大小不等，但相对大小未规定。
-6. STRING: 取两个STRING较短的那个长度为N，比较两个值utf8mb4编码的前N个字节，较短的小，空值最小
-7. INTEGER/DOUBLE: 包括精确值和近似值的比较，稍微有点复杂，可能出现与直觉相悖的结果，具体参见[官方文档](https://dev.mysql.com/doc/refman/5.7/en/json.html#json-comparison)相关说明。
-
-任何JSON值与SQL的NULL常量比较，得到的结果是UNKNOWN。对于JSON值和非JSON值的比较，按照一定的[规则](https://dev.mysql.com/doc/refman/5.7/en/json.html#json-comparison)将非JSON值转化为JSON值，然后按照以上的规则进行比较。
-
 ## 参考链接
 
-[MySQL5.7 的 JSON 实现](http://mysql.taobao.org/monthly/2016/01/03/)
+[MySQL5.7 的 JSON 实现](http://mysql.taobao.org/monthly/2016/01/03/)  
 [MySQL 5.7 JSON 实现简介](https://cloud.tencent.com/developer/article/1004449)
