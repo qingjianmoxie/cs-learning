@@ -38,6 +38,7 @@
 * [125_验证回文串(easy)](./125_valid-palindrome.md)
 * [167_两数之和 II - 输入有序数组(easy)](./167_two-sum-ii-input-array-is-sorted.md)
 * [206_反转链表](./206_reverse-linked-list.md)
+* [696_计数二进制子串(easy)](./696_count-binary-substrings.md)
 
 ## 栈
 * [20_有效的括号](./20_valid-parentheses.md)
@@ -67,6 +68,7 @@
 * [139_单词拆分(medium)](./139_word-break.md)
 
 # 树
+* [99_恢复二叉搜索树(hard)](./99_recover-binary-search-tree.md)
 * [104_二叉树的最大深度(easy)](./104_maximum-depth-of-binary-tree.md)
 * [108_将有序数组转换为二叉搜索树(easy)](./108_convert-sorted-array-to-binary-search-tree.md)
 * [114_二叉树展开为链表(medium)](./114_flatten-binary-tree-to-linked-list.md)
