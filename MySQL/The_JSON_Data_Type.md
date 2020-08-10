@@ -1,18 +1,18 @@
 ## 11.5 The JSON Data Type
 
-* [Creating JSON Values](###Creating-JSON-Values)
+* [Creating JSON Values](#Creating-JSON-Values)
 
-* [Normalization, Merging, and Autowrapping of JSON Values](###Normalization,-Merging,-and-Autowrapping-of-JSON-Values)
+* [Normalization, Merging, and Autowrapping of JSON Values](#Normalization,-Merging,-and-Autowrapping-of-JSON-Values)
 
-* [Searching and Modifying JSON Values](###Searching-and-Modifying-JSON-Values)
+* [Searching and Modifying JSON Values](#Searching-and-Modifying-JSON-Values)
 
-* [JSON Path Syntax](###JSON-Path-Syntax)
+* [JSON Path Syntax](#JSON-Path-Syntax)
 
-* [Comparison and Ordering of JSON Values](###Comparison-and-Ordering-of-JSON-Values)
+* [Comparison and Ordering of JSON Values](#Comparison-and-Ordering-of-JSON-Values)
 
-* [Converting between JSON and non-JSON values](###-Converting-between-JSON-and-non-JSON-values)
+* [Converting between JSON and non-JSON values](#-Converting-between-JSON-and-non-JSON-values)
 
-* [Aggregation of JSON Values](###Aggregation-of-JSON-Values)
+* [Aggregation of JSON Values](#Aggregation-of-JSON-Values)
 
 MySQL supports a native `JSON` data type defined by [RFC 7159](https://tools.ietf.org/html/rfc7159) that enables efficient access to data in JSON (JavaScript Object Notation) documents. The `JSON` data type provides these advantages over storing JSON-format strings in a string column:
 
@@ -706,7 +706,7 @@ MySQL 8.0.2 and later also supports range notation(符号) for subsets of JSON a
 
 JSON values can be compared using the [`=`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_equal), [`<`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_less-than), [`<=`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_less-than-or-equal), [`>`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_greater-than), [`>=`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_greater-than-or-equal), [`<>`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_not-equal), [`!=`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_not-equal), and [`<=>`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_equal-to) operators.
 
-The following comparison operators and functions are not yet supported with JSON values:
+The following comparison operators and functions are **not** yet supported with JSON values:
 
 * [`BETWEEN`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_between)
 
@@ -716,11 +716,9 @@ The following comparison operators and functions are not yet supported with JSON
 
 * [`LEAST()`](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#function_least)
 
-A workaround for the comparison operators and functions just listed is to cast JSON values to a native MySQL numeric or string data type so they have a consistent(一致的) non-JSON scalar type.
-
 Comparison of JSON values takes place at two levels. The first level of comparison is based on the JSON types of the compared values. If the types differ, the comparison result is determined solely(仅, 只) by which type has higher precedence(优先权). If the two values have the same JSON type, a second level of comparison occurs using type-specific rules.
 
-The following list shows the precedences of JSON types, from highest precedence to the lowest. (The type names are those returned by the [`JSON_TYPE()`](https://dev.mysql.com/doc/refman/8.0/en/json-attribute-functions.html#function_json-type) function.) Types shown together on a line have the same precedence. Any value having a JSON type listed earlier in the list compares greater than any value having a JSON type listed later in the list.
+The following list shows the precedences of JSON types, from highest precedence to the lowest. (The type names are those returned by the [`JSON_TYPE()`](https://dev.mysql.com/doc/refman/8.0/en/json-attribute-functions.html#function_json-type) function.) Types shown together on a line have the same precedence. 
 
     BLOB
     BIT
@@ -788,6 +786,7 @@ For JSON values of the same precedence, the comparison rules are type specific:
     ```
 
     The order of two objects that are not equal is unspecified but deterministic.
+    两个对象的顺序是未说明的, 但具有确定性.
 
 * `STRING`
 
