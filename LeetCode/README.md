@@ -59,6 +59,7 @@
 * [112_路径总和(easy)](./112_path-sum.md)
 * [120_三角形最小路径和(medium)](./120_triangle.md)
 * [124_二叉树中的最大路径和(hard)](./124_binary-tree-maximum-path-sum.md)
+* [130_被围绕的区域(medium)](./130_surrounded-regions.md)
 * [785_判断二分图(medium)](./785_is-graph-bipartite.md)
 
 ## 回溯算法
