@@ -18,6 +18,8 @@
 * [mariadb-10.2.32 JSON code](./mariadb-10.2.32-JSON-code.md)
 * [mysql-5.7.28 JSON code](./mysql-5.7.28-JSON-code.md)
 * [JSON_VALID解析](./JSON_VALID解析.md)
+* [JSON比较规则解析](./JSON比较规则解析.md)
+* [int2str](./int2str.md)
 
 # Oracle
 
