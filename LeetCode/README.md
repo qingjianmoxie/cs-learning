@@ -17,6 +17,11 @@
 * [509_斐波那契数(easy)](./509_fibonacci-number.md)
 * [718_最长重复子数组(medium)](./718_maximum-length-of-repeated-subarray.md)
 
+## 字符串
+
+* [43_字符串相乘(medium)](./43_multiply-strings.md)
+* [415_字符串相加(easy)](./415_add-strings.md)
+
 ## 链表
 
 * [2_两数相加](./2_add-two-numbers.md)
