@@ -19,10 +19,6 @@
 链接：https://leetcode-cn.com/problems/maximum-depth-of-binary-tree
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
-## 题解
-
-自己AC了题目, 本来以为还可以, 结果看了优质题解, 自己还是too young too simple.
-
 ```c++
 /**
  * Definition for a binary tree node.
@@ -35,26 +31,15 @@
  */
 class Solution {
 public:
-    int maxDepth(TreeNode *root) {
-        if (NULL == root) {
-            return 0;
-        }
-        if (NULL == root->left && NULL == root->right) {
-            return 1;
-        }
-        int left(1), right(1);
-        if (root->left) {
-            left += maxDepth(root->left);
-        }
-        if (root->right) {
-            right += maxDepth(root->right);
-        }
-        return left > right ? left : right;
+    int maxDepth(TreeNode* root) {
+        
     }
 };
 ```
 
-简化一下可以写成如下形式:
+## 题解
+
+自己AC了题目:
 
 ```c++
 class Solution {
@@ -63,9 +48,7 @@ public:
         if (NULL == root) {
             return 0;
         }
-        int l = maxDepth(root->left) + 1;
-        int r = maxDepth(root->right) + 1;
-        return l > r ? l : r;
+        return max(maxDepth(root->left), maxDepth(root->right)) + 1;
     }
 };
 ```
