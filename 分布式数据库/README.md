@@ -3,6 +3,7 @@
 * [ACID & CAP](./ACID&CAP.md)
 * [隔离级别](./隔离级别.md)
 * [技术博客](./技术博客.md)
+* [消息队列复习精讲](./消息队列.md)
 
 ## leveldb
 * [leveldb-skiplist](./leveldb-skiplist.md)
