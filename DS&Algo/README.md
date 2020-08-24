@@ -25,3 +25,5 @@
 
 * [Trie](./Trie.md)
 * [hash table](./hash_table.md)
+* [Bitmap](./Bitmap.md)
+* [Bloom filter](./Bloom_filter.md)
