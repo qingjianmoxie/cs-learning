@@ -14,6 +14,15 @@
 链接：https://leetcode-cn.com/problems/longest-palindromic-substring
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
+```c++
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        
+    }
+};
+```
+
 ## 题解
 
 ### 方法一：暴力匹配 (Brute Force)
@@ -266,6 +275,53 @@ public:
             }
         }
         return res;
+    }
+};
+```
+
+实际上这是代码合并后的样子, 而且效率也不佳, 因为每个循环中都有substr操作. 面试时没有时间封装函数, 按最容易理解的方式来写.
+
+```c++
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int size = s.size();
+        int max_len(1), res_left(0), res_right(0);
+        for (int i = 1; i < size - 1; ++i) {
+            int left(i), right(i);
+            while (left >= 0 && right < size) {
+                if (s[left] == s[right]) {
+                    --left;
+                    ++right;
+                } else {
+                    break;
+                }
+            }
+            ++left;
+            --right;
+            if (right - left > res_right - res_left) {
+                res_left = left;
+                res_right = right;
+            }
+        }
+        for (int i = 0; i < size - 1; ++i) {
+            int left(i), right(i + 1);
+            while (left >= 0 && right < size) {
+                if (s[left] == s[right]) {
+                    --left;
+                    ++right;
+                } else {
+                    break;
+                }
+            }
+            ++left;
+            --right;
+            if (right - left > res_right - res_left) {
+                res_left = left;
+                res_right = right;
+            }
+        }
+        return s.substr(res_left, res_right - res_left + 1);
     }
 };
 ```
