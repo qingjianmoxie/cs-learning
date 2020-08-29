@@ -26,6 +26,7 @@
   * [enum class](./enum_class.md)
   * [std::function](./std_function.md)
   * [std::bind](./std_bind.md)
+  * [std::move](./std_move.md)
   * [左值,右值,左值引用,右值引用](./左值,右值,左值引用,右值引用.md)
 
 * keywords
