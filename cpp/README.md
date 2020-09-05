@@ -58,6 +58,12 @@
   * [C++11多线程-异步运行(1)之promise](./C++11多线程-async-1-promise.md)
   * [C++11多线程-异步运行(2)之packaged_task](./C++11多线程-async-2-packaged_task.md)
   * [C++11多线程-异步运行(3)之最终篇(future+async)](./C++11多线程-async-3-future.md)
+  * [C++11多线程-线程局部存储](./C++11多线程-thread_local.md)
+  * [C++11多线程-原子操作(1)](./C++11多线程-atomic-1.md)
+  * [C++11多线程-原子操作(2)](C++11多线程-atomic-2.md)
+  * [C++11多线程-内存模型](./C++11多线程-memory_order.md)
+  * [C++11泛型-函数模板](./C++11多线程-generic_function.md)
+  * [C++11泛型-类模板](./C++11多线程-generic_class.md)
   * [transform大小写转换性能调查](./transform大小写转换性能调查.md)
 
 * [new与malloc的区别](./new与malloc的区别.md)

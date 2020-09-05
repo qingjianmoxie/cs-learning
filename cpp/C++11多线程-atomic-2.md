@@ -1,7 +1,9 @@
 # C++11多线程-原子操作(2)
-上一篇我们介绍了原子操作中最简单的std::atomic_flag，今天我们看一下std::atomic\<T\>类。
+上一篇我们介绍了原子操作中最简单的`std::atomic_flag`，今天我们看一下`std::atomic<T>`类。
+
 ## 2. std::atomic\<T\>
 std::atomic是一个模板类，它定义了一些atomic应该具有的通用操作，我们一起来看一下:
+
 ### 2.1 is_lock_free
 ```c++
 bool is_lock_free() const noexcept;
@@ -9,6 +11,7 @@ bool is_lock_free() const volatile noexcept;
 ```
 atomic是否无锁操作。如果是，则在多个线程访问该对象时不会导致线程阻塞(可能使用某种事务内存transactional memory方法实现lock-free的特性)。
 事实上该函数可以做为一个静态函数。所有指定相同类型T的atomic实例的is_lock_free函数都会返回相同值。
+
 ### 2.2 store
 ```c++
 void store(T desr, memory_order m = memory_order_seq_cst) noexcept;
@@ -24,6 +27,7 @@ T operator=(T d) volatile noexpect {
 }
 ```
 **注**：有些编译器，在实现store时限定m只能取以下三个值：memory_order_consume，memory_order_acquire，memory_order_acq_rel。
+
 ### 2.3 load
 ```c++
 T load(memory_order m = memory_order_seq_cst) const volatile noexcept;
@@ -32,12 +36,14 @@ operator T() const volatile noexcept;
 operator T() const noexcept;
 ```
 读取，加载并返回变量的值。operator T是load的简化版，内部调用的是load(memory_order_seq_cst)形式。
+
 ### 2.4 exchange
 ```c++
 T exchange(T desr, memory_order m = memory_order_seq_cst) volatile noexcept;
 T exchange(T desr, memory_order m = memory_order_seq_cst) noexcept;
 ```
 交换，赋值后返回变量赋值前的值。exchange也称为read-modify-write操作。
+
 ### 2.5 compare_exchange_weak
 ```c++
 bool compare_exchange_weak(T& expect, T desr, memory_order s, memory_order f) volatile noexcept;
@@ -50,6 +56,7 @@ bool compare_exchange_weak(T& expect, T desr, memory_order m = memory_order_seq_
 以上只是个示意图，compare_exchange_weak操作是原子的，排它的。其它线程如果想要读取或修改该原子对象时，会等待先该操作完成。
 该函数**直接比较原子对象所封装的值与expect的物理内容**，在某些情况下，对象的比较操作在使用 operator==() 判断时相等，但 compare_exchange_weak 判断时却可能失败，因为对象底层的物理内容中可能存在位对齐或其他逻辑表示相同但是物理表示不同的值(比如 true 和 5，它们在逻辑上都表示"真"，但在物理上两者的表示并不相同)。
 与strong版本不同，weak版允许返回**伪false**，即使原子对象所封装的值与expect的物理内容相同，也仍然返回false。但它在某些平台下会取得更好的性能，在某些循环算法中这种行为也是可接受的。对于非循环算法建议使用compare_exchange_strong。
+
 ### 2.6 compare_exchange_strong
 ```c++
 bool compare_exchange_strong(T& expect, T desr, memory_order s, memory_order f) volatile noexcept;
