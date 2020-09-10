@@ -22,6 +22,8 @@ public:
   Item *part_expr;
   // 分区键的字符串, 注意不是以'\0'结尾, 长度为part_func_len
   char *part_func_string;
+  // 分区键的列的数目
+  uint num_columns;
   // 分区的类型
   partition_type part_type;
   // 分区键字符串的长度
@@ -49,10 +51,8 @@ class partition_element :public Sql_alloc {
 public:
   // partition元素中的值, range分区中是1个, list分区中是多个
   List<part_elem_value> list_val_list;
-  // 如果值是数字, 存在这里
+  // 当是range partition时, 存储元素的值
   longlong range_value;
-  // 如果值是字符串, 存在这里
-  char *str_range_value;
   // partition元素的名字
   char *partition_name;
   // partition元素的备注
@@ -61,8 +61,6 @@ public:
   bool signed_flag;                          // Range value signed
   // 是否含有maxvalue
   bool max_value;                            // MAXVALUE range
-  // 是数字为true, 是字符串为false
-  bool integer_range_value;
 };
 ```
 
@@ -84,8 +82,6 @@ typedef struct p_elem_val
   uint added_items;
   bool null_value;
   bool unsigned_flag;
-  bool integer_value;
-  char* str_value;
   part_column_list_val *col_val_array;
 } part_elem_value;
 
