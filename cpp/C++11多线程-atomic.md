@@ -1,10 +1,88 @@
-# C++11多线程-原子操作(2)
-上一篇我们介绍了原子操作中最简单的`std::atomic_flag`，今天我们看一下`std::atomic<T>`类。
+# C++11多线程-原子操作
 
-## 2. std::atomic\<T\>
+前面我们讲了C++11下的多线程及相关操作，这些操作在绝大多数情况下应该够用了。但在某些极端场合，如需要高性能的情况下，我们还需要一些更高效的同步手段。本节介绍的原子操作是一种lock free的操作，不需要同步锁，具有很高的性能。在化学中原子不是可分割的最小单位，引申到编程中，原子操作是不可打断的最低粒度操作，是线程安全的。**C++11中原子类提供的成员函数都是原子的，是线程安全的。**
+原子操作中最简单的莫过于atomic_flag，只有两种操作：test and set、clear。我们的原子操作就从这种类型开始。
+
+## 1 std::atomic_flag
+
+C++11中所有的原子类都是**不允许拷贝、不允许Move**的，atomic_flag也不例外。atomic_flag顾名思议，提供了标志的管理，标志有三种状态：
+- clear
+- set
+- 未初始化状态。
+
+### 1.1 atomic_flag实例化
+
+缺省情况下atomic_flag处于未初始化状态。除非初始化时使用了`ATOMIC_FLAG_INIT`宏，则此时atomic_flag处于clear状态。
+
+### 1.2 std::atomic_flag::clear
+
+调用该函数将会把atomic_flag置为clear状态。clear状态您可以理解为bool类型的false，set状态可理解为true状态。clear函数没有任何返回值:
+```c++
+void clear(memory_order m = memory_order_seq_cst) volatile noexcept;
+void clear(memory_order m = memory_order_seq_cst) noexcept;
+```
+对于memory_order我们会在后面的章节中详细介绍它，现在先列出其取值及简单释义
+
+|序号|值|意义
+|:--:|:--:|:---
+|1|memory_order_relaxed|宽松模型，不对执行顺序做保证
+|2|memory_order_consume|当前线程中,满足happens-before原则。<br/>当前线程中该原子的所有后续操作,必须在本条操作完成之后执行
+|3|memory_order_acquire|当前线程中,**读**操作满足happens-before原则。<br/>所有后续的**读**操作必须在本操作完成后执行
+|4|memory_order_release|当前线程中,**写**操作满足happens-before原则。<br/>所有后续的**写**操作必须在本操作完成后执行
+|5|memory_order_acq_rel|当前线程中，同时满足memory_order_acquire和memory_order_release
+|6|memory_order_seq_cst|最强约束。全部读写都按顺序执行
+
+### 1.3 test_and_set
+
+该函数会检测flag是否处于set状态，如果不是，则将其设置为set状态，并返回false；否则返回true。![](https://upload-images.jianshu.io/upload_images/6687014-40e5b28ef720dad9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+[test_and_set](https://en.wikipedia.org/wiki/Test-and-set)是典型的*read-modify-write(RMW)*模型，保证多线程环境下只被设置一次。下面代码通过10个线程，模拟了一个计数程序，第一个完成计数的会打印"win"。
+
+```c++
+#include <atomic>    // atomic_flag
+#include <iostream>  // std::cout, std::endl
+#include <list>      // std::list
+#include <thread>    // std::thread
+
+void race(std::atomic_flag &af, int id, int n) {
+    for (int i = 0; i < n; i++) {
+    }
+    // 第一个完成计数的打印：Win
+    if (!af.test_and_set()) {
+        printf("%s[%d] win!!!\n", __FUNCTION__, id);
+    }
+}
+
+int main() {
+    std::atomic_flag af = ATOMIC_FLAG_INIT;
+
+    std::list<std::thread> lstThread;
+    for (int i = 0; i < 10; i++) {
+        lstThread.emplace_back(race, std::ref(af), i + 1, 5000 * 10000);
+    }
+
+    for (std::thread &thr : lstThread) {
+        thr.join();
+    }
+
+    return 0;
+}
+```
+程序输出如下(每次运行，可能率先完成的thread不同):
+```console
+race[7] win!!!
+```
+
+[c++ 并行编程之memory_order](https://www.cnblogs.com/zifeiye/p/8194949.html)
+
+刚才我们介绍了原子操作中最简单的`std::atomic_flag`，接下来我们看一下`std::atomic<T>`类。
+
+## 2 std::atomic\<T\>
+
 std::atomic是一个模板类，它定义了一些atomic应该具有的通用操作，我们一起来看一下:
 
 ### 2.1 is_lock_free
+
 ```c++
 bool is_lock_free() const noexcept;
 bool is_lock_free() const volatile noexcept;
@@ -13,13 +91,14 @@ atomic是否无锁操作。如果是，则在多个线程访问该对象时不�
 事实上该函数可以做为一个静态函数。所有指定相同类型T的atomic实例的is_lock_free函数都会返回相同值。
 
 ### 2.2 store
+
 ```c++
 void store(T desr, memory_order m = memory_order_seq_cst) noexcept;
 void store(T desr, memory_order m = memory_order_seq_cst) volatile noexcept;
 T operator=(T d) noexcept;
 T operator=(T d) volatile noexcept;
 ```
-赋值操作。operator=实际上内部调用了store，并返回d。
+赋值操作operator=实际上内部调用了store，并返回d。
 ```c++
 T operator=(T d) volatile noexpect {
     store(d);
@@ -29,6 +108,7 @@ T operator=(T d) volatile noexpect {
 **注**：有些编译器，在实现store时限定m只能取以下三个值：memory_order_consume，memory_order_acquire，memory_order_acq_rel。
 
 ### 2.3 load
+
 ```c++
 T load(memory_order m = memory_order_seq_cst) const volatile noexcept;
 T load(memory_order m = memory_order_seq_cst) const noexcept;
@@ -38,6 +118,7 @@ operator T() const noexcept;
 读取，加载并返回变量的值。operator T是load的简化版，内部调用的是load(memory_order_seq_cst)形式。
 
 ### 2.4 exchange
+
 ```c++
 T exchange(T desr, memory_order m = memory_order_seq_cst) volatile noexcept;
 T exchange(T desr, memory_order m = memory_order_seq_cst) noexcept;
@@ -45,6 +126,7 @@ T exchange(T desr, memory_order m = memory_order_seq_cst) noexcept;
 交换，赋值后返回变量赋值前的值。exchange也称为read-modify-write操作。
 
 ### 2.5 compare_exchange_weak
+
 ```c++
 bool compare_exchange_weak(T& expect, T desr, memory_order s, memory_order f) volatile noexcept;
 bool compare_exchange_weak(T& expect, T desr, memory_order s, memory_order f) noexcept;
@@ -58,6 +140,7 @@ bool compare_exchange_weak(T& expect, T desr, memory_order m = memory_order_seq_
 与strong版本不同，weak版允许返回**伪false**，即使原子对象所封装的值与expect的物理内容相同，也仍然返回false。但它在某些平台下会取得更好的性能，在某些循环算法中这种行为也是可接受的。对于非循环算法建议使用compare_exchange_strong。
 
 ### 2.6 compare_exchange_strong
+
 ```c++
 bool compare_exchange_strong(T& expect, T desr, memory_order s, memory_order f) volatile noexcept;
 bool compare_exchange_strong(T& expect, T desr, memory_order s, memory_order f) noexcept;
@@ -67,8 +150,11 @@ bool compare_exchange_strong(T& expc, T desr, memory_order m = memory_order_seq_
 compare_exchange的strong版本，进行compare时，与weak版一样，都是比较的物理内容。与weak版不同的是，strong版本不会返回伪false。即：原子对象所封装的值如果与expect在物理内容上相同，strong版本一定会返回true。其所付出的代价是：在某些需要循环检测的算法，或某些平台下，其性能较compare_exchange_weak要差。但对于某些不需要采用循环检测的算法而言, 通常采用compare_exchange_strong 更好。
 
 ## 3. std::atomic特化
-我知道计算擅长处理整数以及指针，并且X86架构的CPU还提供了指令级的CAS操作。C++11为了充分发挥计算的特长，针对数值(std::atmoic\<integral\>)及指针(std::atomic\<T*\>)进行了特化，以提高原子操作的性能。特化后的atomic在通用操作的基础上，还提供了更丰富的功能。
+
+我知道计算擅长处理整数以及指针，并且X86架构的CPU还提供了指令级的CAS操作。C++11为了充分发挥计算的特长，针对数值(`std::atmoic<integral>`)及指针(`std::atomic<T*>`)进行了特化，以提高原子操作的性能。特化后的atomic在通用操作的基础上，还提供了更丰富的功能。
+
 ### 3.1 fetch_add
+
 ```c++
 // T is integral
 T fetch_add(T v, memory_order m = memory_order_seq_cst) volatile noexcept;
@@ -84,7 +170,9 @@ contained += v
 return old
 ```
 其中contained为原子对象封装值，本文后面均使用contained代表该值。**注：** 以上是为了便于理解的伪代码，实际实现是原子的不可拆分的。
+
 ### 3.2 fetch_sub
+
 ```c++
 // T is integral
 T fetch_sub(T v, memory_order m = memory_order_seq_cst) volatile noexcept;
@@ -99,10 +187,15 @@ auto old = contained
 contained -= v
 return old
 ```
+
 ### 3.3 ++, --, +=, -=
+
 不管是基于整数的特化，还是指针特化，atomic均支持这四种操作。其用法与未封装时一样，此处就不一一列举其函数原型了。
+
 ## 4 独属于数值型特化的原子操作 - 位操作
+
 ### 4.1 fetch_and，fetch_or，fetch_xor
+
 位操作，将contained按指定方式进行位操作，并返回contained的旧值。
 ```c++
 integral fetch_and(integral v, memory_order m = memory_order_seq_cst) volatile noexcept;
@@ -118,7 +211,9 @@ auto old = contained
 contained ^= v
 return old
 ```
+
 ### 4.2 operator &=，operator |=，operator ^=
+
 与相应的fetch_*操作不同的是，operator操作返回的是新值:
 ```c++
 T operator &=(T v) volatile noexcept {return fetch_and(v) & v;}
@@ -128,7 +223,9 @@ T operator |=(T v) noexcept {return fetch_or(v) | v;}
 T operator ^=(T v) volatile noexcept {return fetch_xor(v) ^ v;}
 T operator ^=(T v) noexcept {return fetch_xor(v) ^ v;}
 ```
+
 ## 5. std::atomic的限制: trivial copyable
+
 上面我们提到std::atomic提供了通用操作，其实这些操作可以应用到所有**trivially copyable**的类型。从字面意义理解，一个类型如果是拷贝不变的(**trivially copyable**)，则使用memcpy这种方式把它的数据从一个地方拷贝出来会得到相同的结果。编译器如何判断一个类型是否**trivially copyable**呢？C++标准把trivial类型定义如下，一个拷贝不变(**trivially copyable**)类型是指：
   1. 没有non-trivial 的拷贝构造函数
   2. 没有non-trivial的move构造函数
@@ -220,7 +317,7 @@ struct B4 {
     virtual ~B4();
 };
 ```
-STL在其头文件<type_traits>中定义了对**trivially copyable**类型的检测：
+STL在其头文件`<type_traits>`中定义了对**trivially copyable**类型的检测：
 ```c++
 template <typename T>
 struct std::is_trivially_copyable;
