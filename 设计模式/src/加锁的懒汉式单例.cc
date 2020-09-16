@@ -1,7 +1,7 @@
-#include <pthread.h>  // pthread_create
-
 #include <iostream>  // std::cout
+#include <list>      // std::list
 #include <mutex>     // std::mutex
+#include <thread>    // std::thread
 
 ///////////////////  加锁的懒汉式实现  //////////////////
 class SingleInstance {
@@ -13,7 +13,7 @@ public:
     static void deleteInstance();
 
     // 打印实例地址
-    void Print();
+    void Print() { printf("我的实例内存地址是: %p\n", this); }
 
 private:
     // 将其构造和析构成为私有的, 禁止外部构造和析构
@@ -55,53 +55,31 @@ void SingleInstance::deleteInstance() {
     }
 }
 
-void SingleInstance::Print() {
-    std::cout << "我的实例内存地址是:" << this << std::endl;
-}
+SingleInstance::SingleInstance() { printf("构造函数\n"); }
 
-SingleInstance::SingleInstance() { std::cout << "构造函数" << std::endl; }
-
-SingleInstance::~SingleInstance() { std::cout << "析构函数" << std::endl; }
+SingleInstance::~SingleInstance() { printf("析构函数\n"); }
 ///////////////////  加锁的懒汉式实现  //////////////////
 
 // 线程函数
-void *PrintHello(void *threadid) {
-    // 主线程与子线程分离，两者相互不干涉，子线程结束同时子线程的资源自动回收
-    pthread_detach(pthread_self());
-
-    // 对传入的参数进行强制类型转换，由无类型指针变为整形数指针，然后再读取
-    int tid = *((int *)threadid);
-
-    std::cout << "Hi, 我是线程 ID:[" << tid << "]" << std::endl;
+void PrintHello(int threadid) {
+    printf("Hi, I'm thread ID: [%d]\n", threadid);
 
     // 打印实例地址
     SingleInstance::GetInstance()->Print();
-
-    pthread_exit(NULL);
 }
 
-#define NUM_THREADS 5  // 线程个数
+const int NUM_THREADS = 5;  // 线程个数
 
 int main(void) {
-    pthread_t threads[NUM_THREADS] = {0};
-    int indexes[NUM_THREADS] = {0};  // 用数组来保存i的值
-
-    int ret = 0;
-    int i = 0;
-
     std::cout << "main() : 开始 ... " << std::endl;
 
-    for (i = 0; i < NUM_THREADS; i++) {
-        std::cout << "main() : 创建线程:[" << i << "]" << std::endl;
+    std::list<std::thread> lstThread;
+    for (int i = 0; i < NUM_THREADS; i++) {
+        lstThread.emplace_back(PrintHello, i);
+    }
 
-        indexes[i] = i;  //先保存i的值
-
-        // 传入的时候必须强制转换为void* 类型，即无类型指针
-        ret = pthread_create(&threads[i], NULL, PrintHello, (void *)&(indexes[i]));
-        if (ret) {
-            std::cout << "Error:无法创建线程," << ret << std::endl;
-            exit(-1);
-        }
+    for (std::thread &thr : lstThread) {
+        thr.join();
     }
 
     // 手动释放单实例的资源
