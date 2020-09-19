@@ -2,6 +2,7 @@
 
 * [数据类型](./数据类型.md)
 * [SQL解析概述](./SQL解析概述.md)
+* [数据存取函数](./数据存取函数.md)
 * [partition解析](./partition.md)
 * [data structure analysis - sql_list](./data_structure_analysis-sql_list.md)
 * [data structure analysis - String](./data_structure_analysis-String.md)
