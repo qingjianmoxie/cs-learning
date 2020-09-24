@@ -89,7 +89,7 @@
 * [677_键值映射(medium)](./677_map-sum-pairs.md)
 
 ## 动态规划
-* [5_最长回文子串(medium)](./5_longest-palindromic-substring.md)
+* [5_最长回文子串(medium)](./5_longest-palindromic-substring.md)**详解**
 * [10_正则表达式匹配(hard)](./10_regular-expression-matching.md)
 * [44_通配符匹配(hard)](./44_wildcard-matching.md)
 * [63_不同路径II(hard)](./63_unique-paths-ii.md)
