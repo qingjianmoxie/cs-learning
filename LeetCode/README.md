@@ -88,6 +88,7 @@
 * [111_二叉树的最小深度(easy)](./111_minimum-depth-of-binary-tree.md)
 * [114_二叉树展开为链表(medium)](./114_flatten-binary-tree-to-linked-list.md)
 * [297_二叉树的序列化与反序列化(hard)](./297_serialize-and-deserialize-binary-tree.md)
+* [437_路径总和 III(medium)](./437_path-sum-iii.md)
 * [1028_从先序遍历还原二叉树(hard)](./1028_recover-a-tree-from-preorder-traversal.md)
 
 ## Trie
