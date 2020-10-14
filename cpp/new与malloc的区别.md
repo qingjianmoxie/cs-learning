@@ -12,9 +12,9 @@
 
 ## 1.申请的内存所在位置
 
-new操作符从**自由存储区（free store）**上为对象动态分配内存空间，而malloc函数从**堆**上动态分配内存。自由存储区是C++基于new操作符的一个抽象概念，凡是通过new操作符进行内存申请，该内存即为自由存储区。而堆是操作系统中的术语，是操作系统所维护的一块特殊内存，用于程序的内存动态分配，C语言使用malloc从堆上分配内存，使用free释放已分配的对应内存。
+new操作符从**自由存储区(free store)**上为对象动态分配内存空间，而malloc函数从**堆**上动态分配内存。自由存储区是C++基于new操作符的一个抽象概念，凡是通过new操作符进行内存申请，该内存即为自由存储区。而堆是操作系统中的术语，是操作系统所维护的一块特殊内存，用于程序的内存动态分配，C语言使用malloc从堆上分配内存，使用free释放已分配的对应内存。
 
-那么自由存储区是否能够是堆（问题等价于new是否能在堆上动态分配内存），这取决于operator new 的实现细节。自由存储区不仅可以是堆，还可以是静态存储区，这都看operator new在哪里为对象分配内存。
+那么自由存储区是否能够是堆(问题等价于new是否能在堆上动态分配内存)，这取决于operator new 的实现细节。自由存储区不仅可以是堆，还可以是静态存储区，这都看operator new在哪里为对象分配内存。
 
 特别的，new甚至可以不为对象分配内存！**定位new**的功能可以办到这一点：
 
@@ -26,14 +26,16 @@ place_address为一个指针，代表一块内存的地址。当使用上面这�
 
 ```c++
 void * operator new (size_t,void *) //不允许重定义这个版本的operator new
-
 ```
 
 这个operator new**不分配任何的内存**，它只是简单地返回指针实参，然后右new表达式负责在place_address指定的地址进行对象的初始化工作。
 
 ## 2.返回类型安全性
 
-new操作符内存分配成功时，返回的是对象类型的指针，类型严格与对象匹配，无须进行类型转换，故new是符合**类型安全**性的操作符。而malloc内存分配成功则是返回void * ，需要通过强制类型转换将void*指针转换成我们需要的类型。
+new操作符内存分配成功时，返回的是**对象类型的指针**，类型严格与对象匹配，无须进行类型转换，故new是符合**类型安全**性的操作符。
+
+而malloc内存分配成功则是返回`void *` ，需要通过强制类型转换将`void *`指针转换成我们需要的类型。
+
 类型安全很大程度上可以等价于内存安全，类型安全的代码不会试图方法自己没被授权的内存区域。关于C++的类型安全性可说的又有很多了。
 
 ## 3.内存分配失败时的返回值
@@ -43,12 +45,9 @@ new内存分配失败时，会抛出bac_alloc异常，它**不会返回NULL**；
 
 ```c++
 int *a  = (int *)malloc(sizeof(int));
-if(NULL == a)
-{
+if(NULL == a) {
     ...
-}
-else 
-{
+} else {
     ...
 }
 ```
@@ -56,13 +55,10 @@ else
 从C语言走入C++阵营的新手可能会把这个习惯带入C++：
 
 ```c++
-int * a = new int();
-if(NULL == a)
-{
+int *a = new int();
+if(NULL == a) {
     ...
-}
-else
-{   
+} else {
     ...
 }
 ```
@@ -88,9 +84,12 @@ catch (bad_alloc)
 使用new操作符申请内存分配时无须指定内存块的大小，编译器会根据类型信息自行计算，而malloc则需要显式地指出所需内存的尺寸。
 
 ```c++
-class A{...}
-A * ptr = new A;
-A * ptr = (A *)malloc(sizeof(A)); //需要显式指定所需内存大小sizeof(A); 
+class A {
+    string name;
+    int age;
+};
+A *ptr = new A;
+A *ptr = (A *)malloc(sizeof(A)); // 需要显式指定所需内存大小sizeof(A); 
 ```
 
 当然了，我这里使用malloc来为我们自定义类型分配内存是不怎么合适的，请看下一条。
@@ -99,7 +98,7 @@ A * ptr = (A *)malloc(sizeof(A)); //需要显式指定所需内存大小sizeof(A
 
 使用new操作符来分配对象内存时会经历三个步骤：
 
-* 第一步：调用operator new 函数（对于数组是operator new[]）分配一块足够大的，**原始**的，未命名的内存空间以便存储特定类型的对象。
+* 第一步：调用operator new函数(对于数组是operator new[])分配一块足够大的，**原始**的，未命名的内存空间以便存储特定类型的对象。
 * 第二步：编译器运行相应的**构造函数**以构造对象，并为其传入初值。
 * 第三部：对象构造完成后，返回一个指向该对象的指针。
 
@@ -111,18 +110,17 @@ A * ptr = (A *)malloc(sizeof(A)); //需要显式指定所需内存大小sizeof(A
 总之来说，new/delete会调用对象的构造函数/析构函数以完成对象的构造/析构。而malloc则不会。如果你不嫌啰嗦可以看下我的例子：
 
 ```c++
-class A
-{
+class A {
 public:
-	A() :a(1), b(1.11){}
+    A() : a(1), b(1.11) {}
+
 private:
-	int a;
-	double b;
+    int a;
+    double b;
 };
-int main()
-{
-	A * ptr = (A*)malloc(sizeof(A));
-	return 0;
+int main() {
+    A* ptr = (A*)malloc(sizeof(A));
+    return 0;
 }
 ```
 
@@ -136,7 +134,7 @@ int main()
 ```c++
 int main()
 {
-    A * ptr = new A;
+    A* ptr = new A;
 }
 ```
 
@@ -145,10 +143,10 @@ int main()
 
 ## 6.对数组的处理
 
-C++提供了new[]与delete[]来专门处理数组类型:
+C++提供了`new[]`与`delete[]`来专门处理数组类型:
 
 ```c++
-A * ptr = new A[10];//分配10个A对象
+A *ptr = new A[10]; // 分配10个A对象
 ```
 
 使用`new[]`分配的内存必须使用`delete[]`进行释放：
@@ -162,7 +160,7 @@ new对数组的支持体现在它会分别调用构造函数函数初始化每�
 至于malloc，它并不知道你在这块内存上要放的数组还是啥别的东西，反正它就给你一块原始的内存，在给你个内存的地址就完事。所以如果要动态分配一个数组的内存，还需要我们手动自定数组的大小：
 
 ```c++
-int * ptr = (int *)malloc(sizeof(int) * 10);//分配一个10个int元素的数组
+int* ptr = (int*)malloc(sizeof(int) * 10);  //分配一个10个int元素的数组
 ```
 
 ## 7.new与malloc是否可以相互调用
@@ -170,15 +168,13 @@ int * ptr = (int *)malloc(sizeof(int) * 10);//分配一个10个int元素的数�
 operator new /operator delete的实现可以基于malloc，而malloc的实现不可以去调用new。下面是编写operator new /operator delete 的一种简单方式，其他版本也与之类似：
 
 ```c++
-void * operator new (sieze_t size)
-{
-    if(void * mem = malloc(size))
+void *operator new(sieze_t size) {
+    if (void *mem = malloc(size))
         return mem;
     else
         throw bad_alloc();
 }
-void operator delete(void *mem) noexcept
-{
+void operator delete(void *mem) noexcept {
     free(mem);
 }
 ```
@@ -189,15 +185,15 @@ opeartor new /operator delete可以被重载。标准库是定义了operator new
 
 ```c++
 //这些版本可能抛出异常
-void * operator new(size_t);
-void * operator new[](size_t);
-void * operator delete (void * )noexcept;
-void * operator delete[](void *0）noexcept;
+void* operator new(size_t);
+void* operator new[](size_t);
+void* operator delete(void*) noexcept;
+void* operator delete[](void * 0) noexcept;
 //这些版本承诺不抛出异常
-void * operator new(size_t ,nothrow_t&) noexcept;
-void * operator new[](size_t, nothrow_t& );
-void * operator delete (void *,nothrow_t& )noexcept;
-void * operator delete[](void *0,nothrow_t& ）noexcept;
+void* operator new(size_t, nothrow_t&) noexcept;
+void* operator new[](size_t, nothrow_t&);
+void* operator delete(void*, nothrow_t&) noexcept;
+void* operator delete[](void * 0, nothrow_t&) noexcept;
 ```
 
 我们可以自定义上面函数版本中的任意一个，前提是自定义版本必须位于全局作用域或者类作用域中。太细节的东西不在这里讲述，总之，我们知道我们有足够的自由去重载operator new /operator delete ,以决定我们的new与delete如何为对象分配内存，如何回收对象。
@@ -230,7 +226,7 @@ namespace std
 }
 ```
 
-set_new_handler的参数为new_handler指针，指向了operator new 无法分配足够内存时该调用的函数。其返回值也是个指针，指向set_new_handler被调用前正在执行（但马上就要发生替换）的那个new_handler函数。
+set_new_handler的参数为new_handler指针，指向了operator new 无法分配足够内存时该调用的函数。其返回值也是个指针，指向set_new_handler被调用前正在执行(但马上就要发生替换)的那个new_handler函数。
 
 对于malloc，客户并不能够去编程决定内存不足以分配时要干什么事，只能看着malloc返回NULL。
 
