@@ -52,7 +52,7 @@
 * [438_找到字符串中所有字母异位词(medium)](./438_find-all-anagrams-in-a-string.md)
 
 ## 栈
-* [20_有效的括号](./20_valid-parentheses.md)
+* [20_有效的括号(easy)](./20_valid-parentheses.md)
 * [32_最长有效括号(hard)](./32_longest-valid-parentheses.md)
 * [71_简化路径](./71_simplify-path.md)
 * [150_逆波兰表达式求值](./150_evaluate-reverse-polish-notation.md)

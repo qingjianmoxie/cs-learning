@@ -40,32 +40,69 @@
 class Solution {
 public:
     bool isValid(string s) {
-        if (s.length() % 2 != 0)
-            return false;         //一但是奇数说明不是有效的括号
-        map<char, char> wordbook; //建立哈希表
-        wordbook.insert(map<char, char>::value_type(')', '('));
-        wordbook.insert(map<char, char>::value_type(']', '['));
-        wordbook.insert(map<char, char>::value_type('}', '{'));
-        stack<char> mystack; //建立栈
-        for (int i = 0; i < s.length(); i++)
-        {
-            if (s[i] == '[' || s[i] == '{' || s[i] == '(')      //匹配到左括号
-                mystack.push(s[i]);                             //放入栈中
-            else if (s[i] == ']' || s[i] == '}' || s[i] == ')') //匹配到右括号
-            {
-                if (mystack.empty())
-                    return false;
-                //匹配到右括号，栈中应该存在左括号。否则就是无效的括号
-                if (wordbook[s[i]] == mystack.top()) //与栈顶元素进行匹配
-                    mystack.pop(); //匹配成功删除栈顶元素
-                else
-                    return false;
-            }
-        }
-        if (mystack.empty())
-            return true; //有效的括号到最后检测结束栈中应没有元素
-        else
-            return false;
+
     }
 };
+```
+
+## 题解
+
+```c++
+class Solution {
+public:
+    bool isValid(string s) {
+        if (s.size() % 2 != 0) {
+            //一但是奇数说明不是有效的括号
+            return false;
+        }
+        stack<char> mystack;
+        map<char, char> map;
+        map.insert(make_pair(')', '('));
+        map.insert(make_pair(']', '['));
+        map.insert(make_pair('}', '{'));
+        for (int i = 0; i < s.size(); i++) {
+            if ('(' == s[i] || '[' == s[i] || '{' == s[i]) {
+                mystack.push(s[i]);
+            } else if (')' == s[i] || ']' == s[i] || '}' == s[i]) {
+                if (mystack.empty()) {
+                    return false;
+                } else {
+                    if (mystack.top() == map[s[i]]) {
+                        mystack.pop();
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+        if (mystack.empty()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+};
+```
+
+```py
+def isValid(self, s: str):
+        left = [] # 定义一个左栈，记录所有的左括号
+        match = {'}':'{', ']':'[', ')':'('} # 定义一个字典，检查当前str是否是右括号
+        right = {'}', ']', ')'} # 定义一个右括号集合，方便快速检查
+        
+        # 进行循环，如果当前str是左括号，则入栈；如果是右括号，则检查左栈的最后一个元素是不是
+        # 与其对应。
+        for x in s:
+            if x in right:
+                if len(left) == 0 or match[x] != left[-1]: 
+                    return(False) # 如果对应的左栈元素不符（括号种类不同或左栈为空），返回False
+                else:
+                    left.pop() # 移除左栈最顶端的元素
+            else:
+                left.append(x) # 当前str是左括号，入左栈
+        
+        if len(left) == 0:
+            return(True) # 如果左栈为空（左右括号数相等），返回True
+        else:
+            return(False)
 ```
