@@ -32,7 +32,8 @@ public:
 
 ## 题解
 
-写代码的时候写蒙了, 看了题解才反应过来哪里写的不对, 第一个版本:
+看到题目, 首先想到的是将竖式乘法写为代码的形式.
+这个过程看似简单，但是其中涉及乘法进位，涉及错位相加，还涉及加法进位；而且还有一些不易察觉的问题，比如说两位数乘以两位数，结果可能是四位数，也可能是三位数，你怎么想出一个标准化的处理方式？没有一定的编码能力, 这些都在困扰着我.
 
 ```c++
 class Solution {
@@ -49,28 +50,24 @@ public:
         string res = "0";
         for (int j = size2 - 1; j >= 0; --j) {
             // 每次算出的值, 倒序
-            string each_res = "";
+            string tmp = "";
             for (int i = 0; i < size2 - 1 - j; ++i) {
-                each_res += '0';
+                tmp += '0';
             }
-            // 个位数字
-            int one_figure = 0;
-            // 十位数字
-            int two_figure = 0;
-            int right = num2[j] - '0';
+            int carry = 0;
+            int n2 = num2[j] - '0';
             for (int i = size1 - 1; i >= 0; --i) {
-                int left = num1[i] - '0';
+                int n1 = num1[i] - '0';
                 // 当前的乘积 + 上一位乘积的十位
-                int sum = left * right + two_figure;
-                one_figure = sum % 10;
-                each_res += '0' + one_figure;
-                two_figure = sum / 10;
+                int sum = n1 * n2 + carry;
+                tmp += '0' + sum % 10;
+                carry = sum / 10;
             }
-            if (0 != two_figure) {
-                each_res += '0' + two_figure;
+            if (0 != carry) {
+                tmp += '0' + carry;
             }
             // 将该列结果与res求和
-            res = add(res, each_res);
+            res = add(res, tmp);
         }
         reverse(res.begin(), res.end());
         return res;
@@ -93,7 +90,22 @@ public:
 };
 ```
 
-[优质题解](https://leetcode-cn.com/problems/multiply-strings/solution/you-hua-ban-shu-shi-da-bai-994-by-breezean/)
+复杂度分析
+
++ 时间复杂度：O(M N)。M,N 分别为 num1 和 num2 的长度。
++ 空间复杂度：O(M+N)。用于存储计算结果。
+
+### 优化的竖式乘法
+
+在竖式乘法运算过程中, 我们可以用一个数组在底下接收相加结果. 而这个数组多长呢? 不难想出, M位数字 与 N位数字 的乘积最大为 M+N.
+
+整个计算过程大概是这样，有两个指针 `i，j` 在 `num1` 和 `num2` 上游走，计算乘积，同时将乘积叠加到 `res` 的正确位置.
+
+现在还有一个关键问题，如何将乘积叠加到 `res` 的正确位置，或者说，如何通过 `i，j` 计算 `res` 的对应索引呢？
+
+其实，细心观察之后就发现，`num1[i]` 和 `num2[j]` 的乘积对应的就是 `res[i+j]` 和 `res[i+j+1]` 这两个位置。
+
+明白了这一点，就可以用代码模仿出这个计算过程了：
 
 ```c++
 class Solution {
@@ -119,11 +131,20 @@ public:
         }
 
         string res = "";
-        for (int i = 0; i < ans.size(); ++i) {
-            if (0 == i && 0 == ans[i]) continue;
+        // 结果前缀可能存的 0（未使用的位）
+        int i = 0;
+        if (0 == ans[i]) i++;
+        for (; i < ans.size(); ++i) {
             res += '0' + ans[i];
         }
         return res;
     }
 };
 ```
+
+复杂度分析
+
++ 时间复杂度：O(M N)。M,N 分别为 num1 和 num2 的长度。
++ 空间复杂度：O(M+N)。用于存储计算结果。
+
+虽然两者时间复杂度和空间复杂度相同，但优化竖式执行速度提高很明显，普通竖式耗时主要还是对每步计算的字符串相加这个过程。
