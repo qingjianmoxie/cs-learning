@@ -6,9 +6,8 @@
 typedef int ElementType;
 
 // The TreeNode structure holds the data and pointers for one tree node.
-typedef struct TreeNode
-{
-    ElementType data;
+typedef struct TreeNode {
+    ElementType val;
     struct TreeNode *left;
     struct TreeNode *right;
 } TreeNode;
@@ -16,28 +15,23 @@ typedef struct TreeNode
 typedef TreeNode *BinTree;
 
 /*
-**	The pointer to the root node in the tree.
-*/
-static TreeNode *tree;
-
-/*
 ** insert
-**	Add a new data to the tree.  The argument is the data
-**	to be added and must not already exist in the tree.
+**  Add a new data to the tree.  The argument is the data
+**  to be added and must not already exist in the tree.
 */
-void insert(ElementType data);
+void insert(ElementType value, BinTree root);
 
 /*
 ** find
-**	Searches for a specific data, which is passed as the first
-**	argument.
+**  Searches for a specific data, which is passed as the first argument.
 */
-ElementType *find(ElementType data);
+TreeNode *find_recursion(ElementType value, BinTree root);
+TreeNode *find_iteration(ElementType value, BinTree root);
 
-/*
-** pre_order_traverse
-**	Does a pre-order traversal of the tree.  The argument is a
-**	pointer to a callback function that will be called for
-**	each node in the tree, with the data passed as an argument.
-*/
-void pre_order_traverse(void (*callback)(ElementType data));
+TreeNode *FindMin(BinTree root);
+TreeNode *FindMax(BinTree root);
+
+/********
+ * Delete
+ ********/
+TreeNode *Delete(ElementType value, BinTree root);
