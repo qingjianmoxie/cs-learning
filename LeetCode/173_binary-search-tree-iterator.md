@@ -4,7 +4,11 @@
 
 示例：
 
-![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/25/bst-tree.png)
+        7
+       / \
+      3   15
+          / \
+         9   20
 
     BSTIterator iterator = new BSTIterator(root);
     iterator.next();    // 返回 3
@@ -26,14 +30,6 @@
 链接：https://leetcode-cn.com/problems/binary-search-tree-iterator
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
-## 题解
-
-**方法一：扁平化二叉搜索树**
-
-在计算机程序设计中，迭代器是使程序员能够遍历容器的对象。这是维基百科对迭代器的定义。当前，实现迭代器的最简单的方法是在类似数组的容器接口上。如果我们有一个数组，则我们只需要一个指针或者索引，就可以轻松的实现函数 next() 和 hasNext()。
-
-因此，我们要研究的第一种方法就是基于这种思想。我们将使用额外的数组，并将二叉搜索树展开存放到里面。我们想要数组的元素按升序排序，则我们应该对二叉搜索树进行中序遍历，然后我们在数组中构建迭代器函数。
-
 ```c++
 /**
  * Definition for a binary tree node.
@@ -45,40 +41,19 @@
  * };
  */
 class BSTIterator {
-    vector<int> values;
-
 public:
     BSTIterator(TreeNode* root) {
-        stack<TreeNode *> s;
-        TreeNode *tmp = root;
-        while (tmp || !s.empty())
-        {
-            while (tmp)
-            {
-                s.push(tmp);
-                tmp = tmp->left;
-            }
-            tmp = s.top();
-            s.pop();
-            values.push_back(tmp->val);
-            tmp = tmp->right;
-        }
-        reverse(values.begin(), values.end());
+
     }
     
     /** @return the next smallest number */
     int next() {
-        int res = values.back();
-        values.pop_back();
-        return res;
+
     }
     
     /** @return whether we have a next smallest number */
     bool hasNext() {
-        if (values.empty())
-            return false;
-        else
-            return true;
+
     }
 };
 
@@ -88,18 +63,19 @@ public:
  * int param_1 = obj->next();
  * bool param_2 = obj->hasNext();
  */
- ```
+```
 
-**复杂度分析**
+## 题解
 
-+ 时间复杂度：构造迭代器花费的时间为 O(N)，问题陈述只要求我们分析两个函数的复杂性，但是在实现类时，还要注意初始化类对象所需的时间；在这种情况下，时间复杂度与二叉搜索树中的节点数成线性关系。
-    + next()：O(1)
-    + hasNext()：O(1)
-+ 空间复杂度：O(N)，由于我们创建了一个数组来包含二叉搜索树中的所有节点值，这不符合问题陈述中的要求，任一函数的最大空间复杂度应为 O(h)，其中 h 指的是树的高度，对于平衡的二叉搜索树，高度通常为 logN。
+**方法一：中序遍历**
+
+首先想到的方法是用一个数组存放中序遍历后的升序序列, 但是空间复杂度达不到要求.
+
+空间复杂度：O(N)，由于我们创建了一个数组来包含二叉搜索树中的所有节点值，这不符合问题陈述中的要求，任一函数的最大空间复杂度应为 O(h)，其中 h 指的是树的高度，对于平衡的二叉搜索树，高度通常为 logN。
 
 **方法二：受控递归**
 
-我们前面使用的方法在空间上与二叉搜索树中的节点数呈线性关系。然而，我们不得不使用这种方法的原因是我们在数组上迭代，且我们不能够暂停递归，然后在某个时候启动它。
+我们前面想到的方法在空间上与二叉搜索树中的节点数呈线性关系。然而，我们不得不使用这种方法的原因是我们在数组上迭代，且我们不能够暂停递归，然后在某个时候启动它。
 
 但是，如果我们可以模拟中序遍历的受控递归，那么除了堆栈用于模拟递归的空间之外，实际上不需要使用任何其他空间。
 
@@ -117,15 +93,6 @@ public:
 6. next() 函数调用中，获取下一个最小的元素不需要花太多时间，但是要保证栈顶元素是 next() 函数返回的元素方面花费了一些时间。
 
  ```c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class BSTIterator {
     stack<TreeNode *> s;
 
@@ -158,14 +125,7 @@ public:
         return s.size() > 0;
     }
 };
-
-/**
- * Your BSTIterator object will be instantiated and called as such:
- * BSTIterator* obj = new BSTIterator(root);
- * int param_1 = obj->next();
- * bool param_2 = obj->hasNext();
- */
- ```
+```
 
 **复杂度分析**
 
@@ -173,3 +133,9 @@ public:
     + hasNext()：若栈中还有元素，则返回 true，反之返回 false。所以这是一个 O(1) 的操作。
     + next()：包含了两个主要步骤。一个是从栈中弹出一个元素，它是下一个最小的元素。这是一个 O(1) 的操作。然而，随后我们要调用帮助函数 `inorderLeft` ，它需要递归的，将左节点添加到栈上，是线性时间的操作，最坏的情况下为 O(N)。但是我们只对含有右节点的节点进行调用，它也不会总是处理 N 个节点。只有当我们有一个倾斜的树，才会有 N 个节点。因此该操作的平均时间复杂度仍然是 O(1)，符合问题中所要求的。
 + 空间复杂度：O(h)，使用了一个栈来模拟递归。
+
+很多小伙伴会对next()中的循环操作的复杂度感到疑惑，认为既然加入了循环在里面，那时间复杂度肯定是大于O(1)不满足题目要求的。
+
+仔细分析一下，该循环只有在节点有右子树的时候才需要进行，也就是不是每一次操作都需要循环的，循环的次数加上初始化的循环总共会有O(n)次操作，均摊到每一次next()的话平均时间复杂度则是O(n)/n=O(1)，因此可以确定该实现方式满足O(1)的要求。
+
+这种分析方式称为摊还分析，详细的学习可以看看**算法导论 第17章 摊还分析**.
