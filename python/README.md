@@ -2,7 +2,14 @@
 
 [python2.7文档](https://docs.python.org/zh-cn/2.7/)
 
+* [数据类型](./数据类型.md)
+* [字符串和编码](./字符串和编码.md)
 * [list和tuple](./list和tuple.md)
+* [dict和set](./dict和set.md)
+* [选择结构和循环结构](./选择结构和循环结构.md)
+* [切片](./切片.md)
+* [列表生成式](./列表生成式.md)
+
 * [逐行读取数据](./逐行读取数据.md)
 * [encode()和decode()](./encode()和decode().md)
 * [字符串处理](./字符串处理.md)

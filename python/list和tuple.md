@@ -10,7 +10,6 @@ Python内置的一种数据类型是列表：list。list是一种有序的集合
 >>> classmates = ['Michael', 'Bob', 'Tracy']
 >>> classmates
 ['Michael', 'Bob', 'Tracy']
-
 ```
 
 变量`classmates`就是一个list。用`len()`函数可以获得list元素的个数：
@@ -18,7 +17,6 @@ Python内置的一种数据类型是列表：list。list是一种有序的集合
 ```
 >>> len(classmates)
 3
-
 ```
 
 用索引来访问list中每一个位置的元素，记得索引是从`0`开始的：
@@ -34,17 +32,15 @@ Python内置的一种数据类型是列表：list。list是一种有序的集合
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 IndexError: list index out of range
-
 ```
 
-当索引超出了范围时，Python会报一个`IndexError`错误，所以，要确保索引不要越界，记得最后一个元素的索引是`len(classmates) - 1`。
+当索引超出了范围时，Python会报一个`IndexError`错误，所以，要确保索引不要越界。
 
 如果要取最后一个元素，除了计算索引位置外，还可以用`-1`做索引，直接获取最后一个元素：
 
 ```
 >>> classmates[-1]
 'Tracy'
-
 ```
 
 以此类推，可以获取倒数第2个、倒数第3个：
@@ -58,7 +54,6 @@ IndexError: list index out of range
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 IndexError: list index out of range
-
 ```
 
 当然，倒数第4个就越界了。
@@ -69,7 +64,6 @@ list是一个可变的有序表，所以，可以往list中追加元素到末尾
 >>> classmates.append('Adam')
 >>> classmates
 ['Michael', 'Bob', 'Tracy', 'Adam']
-
 ```
 
 也可以把元素插入到指定的位置，比如索引号为`1`的位置：
@@ -78,7 +72,6 @@ list是一个可变的有序表，所以，可以往list中追加元素到末尾
 >>> classmates.insert(1, 'Jack')
 >>> classmates
 ['Michael', 'Jack', 'Bob', 'Tracy', 'Adam']
-
 ```
 
 要删除list末尾的元素，用`pop()`方法：
@@ -88,7 +81,6 @@ list是一个可变的有序表，所以，可以往list中追加元素到末尾
 'Adam'
 >>> classmates
 ['Michael', 'Jack', 'Bob', 'Tracy']
-
 ```
 
 要删除指定位置的元素，用`pop(i)`方法，其中`i`是索引位置：
@@ -98,7 +90,6 @@ list是一个可变的有序表，所以，可以往list中追加元素到末尾
 'Jack'
 >>> classmates
 ['Michael', 'Bob', 'Tracy']
-
 ```
 
 要把某个元素替换成别的元素，可以直接赋值给对应的索引位置：
@@ -113,7 +104,6 @@ list里面的元素的数据类型也可以不同，比如：
 
 ```
 >>> L = ['Apple', 123, True]
-
 ```
 
 list元素也可以是另一个list，比如：
@@ -201,10 +191,18 @@ Python在显示只有1个元素的tuple时，也会加一个逗号`,`，以免�
 
 这个tuple定义的时候有3个元素，分别是`'a'`，`'b'`和一个list。不是说tuple一旦定义后就不可变了吗？怎么后来又变了？
 
+别急，我们先看看定义的时候tuple包含的3个元素：
+
+![](https://www.liaoxuefeng.com/files/attachments/923973516787680/0)
+
 当我们把list的元素`'A'`和`'B'`修改为`'X'`和`'Y'`后，tuple变为：
 
-[](https://www.liaoxuefeng.com/files/attachments/923973647515872/0)
+![](https://www.liaoxuefeng.com/files/attachments/923973647515872/0)
 
 表面上看，tuple的元素确实变了，但其实变的不是tuple的元素，而是list的元素。tuple一开始指向的list并没有改成别的list，所以，tuple所谓的“不变”是说，tuple的每个元素，指向永远不变。即指向`'a'`，就不能改成指向`'b'`，指向一个list，就不能改成指向其他对象，但指向的这个list本身是可变的！
 
 理解了“指向不变”后，要创建一个内容也不变的tuple怎么做？那就必须保证tuple的每一个元素本身也不能变。
+
+## 小结
+
+list和tuple是Python内置的有序集合，一个可变，一个不可变。根据需要来选择使用它们。
