@@ -38,3 +38,4 @@
 * [Bloom filter](./Bloom_filter.md)
 
 * [常用的位操作](./常用的位操作.md)
+* [素数筛](./素数筛.md)
