@@ -39,23 +39,39 @@
 链接：https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
+```c++
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+
+    }
+};
+```
+
 ## 题解
 
-首先：i 表示 dst 数组的大小。j 表示 src 数组尚未处理的元素的起始位置。初始化 i = 0, j = 0.
+显然，由于数组已经排序，所以重复的元素一定连在一起，找出它们并不难，但如果毎找到一个重复元素就立即删除它，就是在数组中间进行删除操作，整个时间复杂度是会达到 O(N^2)。而且题目要求我们原地修改，也就是说不能用辅助数组，空间复杂度得是 O(1)。
 
-把其中一个数组 src 的内容复制到另一个数组 dst 中去。如果 dst[i-1] 和 src[j] 相同，则不用复制，跳过当前的 src[j] 就行了。由于复制的过程并不会破坏掉 src[j..n) 中的元素，因此 dst 和 src 只使用同一个数组 nums 就行了。
+其实，**对于数组相关的算法问题，有一个通用的技巧：要尽量避免在中间删除元素，那我就先想办法把这个元素换到最后去**。这样的话，最终待删除的元素都拖在数组尾部，一个一个 pop 掉就行了，每次操作的时间复杂度也就降低到 O(1) 了。
+
+按照这个思路呢，又可以衍生出解决类似需求的通用方式：双指针技巧。具体一点说，应该是快慢指针。
+
+我们让慢指针 `slow` 走在后面，快指针 `fast` 走在前面探路，找到一个不重复的元素就告诉 `slow` 并让 `slow` 前进一步。这样当 `fast` 指针遍历完整个数组 `nums` 后，**`nums[0..slow]` 就是不重复元素，之后的所有元素都是重复元素**。
 
 ```c++
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) {
+        int size = nums.size();
+        if (size < 2) return size;
         int i = 0;
-        for (int j = 0; j < nums.size(); ++j) {
-            if (i == 0 || nums[i - 1] != nums[j]) {
-                nums[i++] = nums[j];
+        for (int j = 1; j < size; ++j) {
+            if (nums[j] > nums[i]) {
+                i++;
+                nums[i] = nums[j];
             }
         }
-        return i;
+        return i + 1;
     }
 };
 ```
