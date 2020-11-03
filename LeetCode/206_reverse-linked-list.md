@@ -12,6 +12,25 @@
 链接：https://leetcode-cn.com/problems/reverse-linked-list
 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+
+    }
+};
+```
+
+## 题解
+
 方法1: 好理解的双指针
 
 + 定义两个指针： pre 和 curr; pre 在前 curr 在后。
@@ -24,21 +43,12 @@
     curr   pre
 
 ```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) {
         ListNode *curr = NULL;
         ListNode *pre = head;
-        while (pre)
-        {
+        while (pre) {
             ListNode *tmp = pre->next;
             pre->next = curr;
             curr = pre;
@@ -51,20 +61,17 @@ public:
 
 方法2: 递归
 
+**对于递归算法，最重要的就是明确递归函数的定义**。具体来说，我们的 `reverse` 函数定义是这样的：
+
+**输入一个节点 `head`，将「以 `head` 为起点」的链表反转，并返回反转之后的头结点**。
+
+明确了函数定义, 就容易看懂代码了.
+
 ```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) {
-        if (head == NULL || head->next == NULL)
-        {
+        if (NULL == head || NULL == head->next) {
             return head;
         }
         ListNode *ret = reverseList(head->next);

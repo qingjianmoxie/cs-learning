@@ -31,6 +31,7 @@
 * [24_两两交换链表中的节点](./24_swap-nodes-in-pairs.md)
 * [25_K个一组翻转链表](./25_reverse-nodes-in-k-group.md)
 * [61_旋转链表](./61_rotate-list.md)
+* [92_反转链表 II(medium)](./92_reverse-linked-list-ii.md)
 * [206_反转链表](./206_reverse-linked-list.md)
 
 ## 双指针
