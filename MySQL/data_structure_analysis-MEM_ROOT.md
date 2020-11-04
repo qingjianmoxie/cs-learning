@@ -5,7 +5,7 @@
 ## 数据结构
 
 在具体分析之前, 我们先例举在结构体使用过程中用到的一些宏:
-```c
+```c++
 #define MY_ALIGN(A,L)	(((A) + (L) - 1) & ~((L) - 1))
 #define ALIGN_SIZE(A)	MY_ALIGN((A),sizeof(double))
 ```
@@ -78,33 +78,26 @@ pre_alloc表示预分配的内存块列表。
 
 ### init_alloc_root()函数
 
-`init_alloc_root()`初始化函数，主要对MEM_ROOT的参数进行初始化，默认设置参数min_malloc的值为32，参数block_num的值为4，参数block_size的值为输入参数block_size的大小减去常量值ALLOC_ROOT_MIN_BLOCK_SIZE.
-ALLOC_ROOT_MIN_BLOCK_SIZE包含USED_MEM的大小、常量MALLOC_OVERHEAD值为8，以及最小block的大小8。
-```c++
-#define ALLOC_ROOT_MIN_BLOCK_SIZE (MALLOC_OVERHEAD + sizeof(USED_MEM) + 8)
-```
-以下是pre_alloc_size为0，init_alloc_root()函数的初始化状态。
-
-| | |
-| :- | :-
-| USED_MEM *free | 0
-| USED_MEM *used | 0
-| USED_MEM *pre_alloc | 0
-| size_t min_malloc | 32
-| size_t block_size | block_size-8-sizeof(USED_MEM)-8
-| unsigned int block_num | 4
-| unsigned int first_block_usage | 0
-| void (*error_handler)(void) | 0
-
-图1 pre_alloc_size = 0
-
-特别注意的，如果输入参数pre_alloc_size的值不为0，那么预分配内存空间，并将pre_malloc和free指针指向该内存空间。pre_alloc_size是需要的内存大小，而实际分配的内存空间大小为pre_alloc_size + ALIGN_SIZE(sizeof(USED_MEM))，因此free指针中的参数size的值为内存实际分配的大小，参数left的值为pre_alloc_size的值。pre_alloc_size不为0情况下，init_alloc_root()函数的初始化状态。
-
-![图2 pre_alloc_size不为0](http://blog.chinaunix.net/attachment/201211/17/26896862_1353151884d1AZ.jpg)
-图2 pre_alloc_size不为0
+`init_alloc_root()`初始化函数，主要对MEM_ROOT的参数进行初始化。
 
 init_alloc_root()代码如下
 ```c++
+/*
+  How much overhead does malloc have. The code often allocates
+  something like 1024-MALLOC_OVERHEAD bytes
+*/
+#define MALLOC_OVERHEAD 8
+// 最小block大小为8
+#define ALLOC_ROOT_MIN_BLOCK_SIZE (MALLOC_OVERHEAD + sizeof(USED_MEM) + 8)
+
+/*
+  For instrumented code: don't preallocate memory in alloc_root().
+  This gives a lot more memory chunks, each with a red-zone around them.
+ */
+#if !defined(HAVE_VALGRIND) && !defined(HAVE_ASAN)
+#define PREALLOCATE_MEMORY_CHUNKS
+#endif
+
 /*
   Initialize memory root
 
@@ -133,6 +126,7 @@ void init_alloc_root(PSI_memory_key key,
   DBUG_ENTER("init_alloc_root");
   DBUG_PRINT("enter",("root: 0x%lx", (long) mem_root));
 
+  // 以下是pre_alloc_size为0，init_alloc_root()函数的初始化状态
   mem_root->free= mem_root->used= mem_root->pre_alloc= 0;
   mem_root->min_malloc= 32;
   mem_root->block_size= block_size - ALLOC_ROOT_MIN_BLOCK_SIZE;
@@ -168,15 +162,27 @@ void init_alloc_root(PSI_memory_key key,
 否则，从找到的block块上分配内存空间，并返回当前block剩余的首地址，并修改left值。如果分配后，该block块的值小于参数min_malloc的值，那么将该block添加到used内存列表中。  
 特别注意的是，在查看free内存列表时，如果free中第一个block的first_block_usage值大于10次（即第一个block块查找分配失败次数大于10次），并且left的空间小于4096时，将该block添加到used列表中。
 
-具体处理逻辑的简化流程图如下所示：
-
-![图3 alloc_root()流程图](http://blog.chinaunix.net/attachment/201211/17/26896862_135315191658RM.jpg)
-图3 alloc_root()流程图
-
 alloc_root()代码如下:
 ```c++
+/**
+  Function allocates the requested memory in the mem_root specified.
+  If max_capacity is defined for the mem_root, it only allocates
+  if the requested size can be allocated without exceeding the limit.
+  However, when error_for_capacity_exceeded is set, an error is flagged
+  (see set_error_reporting), but allocation is still performed.
+
+  @param mem_root           memory root to allocate memory from
+  @length                   size to be allocated
+
+  @retval
+  void *                    Pointer to the memory thats been allocated
+  @retval
+  NULL                      Memory is not available.
+*/
+
 void *alloc_root(MEM_ROOT *mem_root, size_t length)
 {
+  ...
   size_t get_size, block_size;
   uchar* point;
   USED_MEM *next= 0;
@@ -196,13 +202,18 @@ void *alloc_root(MEM_ROOT *mem_root, size_t length)
   length= ALIGN_SIZE(length);
   if ((*(prev= &mem_root->free)) != NULL)
   {
+    // free list中第一个block中left的空间不满足需要分配的空间，
+    // 且该block中已经查找过了10次(ALLOC_MAX_BLOCK_USAGE_BEFORE_DROP)都不满足分配长度，
+    // 且该block剩余空间小于4096(ALLOC_MAX_BLOCK_TO_DROP)
     if ((*prev)->left < length &&
 	mem_root->first_block_usage++ >= ALLOC_MAX_BLOCK_USAGE_BEFORE_DROP &&
 	(*prev)->left < ALLOC_MAX_BLOCK_TO_DROP)
     {
       next= *prev;
       *prev= next->next;			/* Remove block from list */
+      // free list中第一个block的next指针指向used
       next->next= mem_root->used;
+      // used头指针指向第一个block
       mem_root->used= next;
       mem_root->first_block_usage= 0;
     }
@@ -257,13 +268,6 @@ void *alloc_root(MEM_ROOT *mem_root, size_t length)
 `free_root()`函数主要用于释放分配的内存空间。但是该函数根据输入不同的标志，用于释放内存的方式有些不同。该函数的处理逻辑为:  
 如果输入的标志仅仅用于标示该内存空间为释放，而不是真正的释放内存，那么调用mark_blocks_free()函数标记所有的空间已经释放，以便于重用。  
 否则，如果输入的标志不需要保留预分配的内存空间，那么预分配空间置为空，并分别释放used和free列表中的block内存列表。
-
-具体处理逻辑的简化流程图如图4所示：
-
-![图4 free_root()流程图](http://blog.chinaunix.net/attachment/201211/17/26896862_135315193799k9.jpg) 
-图4 free_root()流程图
-
-其中mark_blocks_free()函数的处理逻辑较为简单，仅仅是将free列表中的每个block的left值设置为block块的实际可用的内存大小，并将used列表中的block添加到free列表中，执行相同的操作。而free过程在流程图中用函数free代替，该处理代码是对链表的处理，需要特别注意的是，在释放之前需要判断是否是pre_alloc的内存空间。如果是pre_alloc指向的内存空间，不释放该block的内存空间。
 
 free_root()代码如下:
 ```c++
@@ -337,12 +341,41 @@ void free_root(MEM_ROOT *root, myf MyFlags)
 }
 ```
 
+其中mark_blocks_free()函数的处理逻辑较为简单，仅仅是将free列表中的每个block的left值设置为block块的实际可用的内存大小，并将used列表中的block添加到free列表中，执行相同的操作。
+
+```c++
+/* Mark all data in blocks free for reusage */
+
+static inline void mark_blocks_free(MEM_ROOT* root)
+{
+  USED_MEM *next;
+  USED_MEM **last;
+
+  /* iterate through (partially) free blocks, mark them free */
+  last= &root->free;
+  for (next= root->free; next; next= *(last= &next->next))
+  {
+    next->left= next->size - (uint)ALIGN_SIZE(sizeof(USED_MEM));
+    TRASH_MEM(next);
+  }
+
+  /* Combine the free and the used list */
+  *last= next=root->used;
+
+  /* now go through the used blocks and mark them free */
+  for (; next; next= next->next)
+  {
+    next->left= next->size - (uint)ALIGN_SIZE(sizeof(USED_MEM));
+    TRASH_MEM(next);
+  }
+
+  /* Now everything is set; Indicate that nothing is used anymore */
+  root->used= 0;
+  root->first_block_usage= 0;
+}
+```
+
 ## 结论
 
 通过以上分析MEM_ROOT数据结构及相关处理操作。可以发现，这种内存分配管理方式，在free_root()时，将内存空间标记为释放，可以使得内存空间重用，提高重复使用相同大小或类型的内存空间的效率，而降低真正内存分配的时间代价。
 MEM_ROOT的内存分配采用的是启发式分配算法，随着后续block的数量越多，单个block的内存也会越大: block_size= mem_root->block_size * (mem_root->block_num >> 2).
-
-## 文章来源
-
-[MySQL数据结构分析--MEM_ROOT](http://blog.chinaunix.net/uid-26896862-id-3412033.html)
-[细说MySQL 之MEM_ROOT](http://blog.chinaunix.net/uid-20708886-id-5581118.html)
